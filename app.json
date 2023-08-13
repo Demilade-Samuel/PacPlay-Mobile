@@ -5,6 +5,12 @@
       "bundler": "metro"
     },
     "name": "PacPlay",
-    "slug": "PacPlay"
+    "slug": "PacPlay",
+    "android": {
+      "package": "com.anonymous.PacPlay"
+    },
+    "ios": {
+      "bundleIdentifier": "com.anonymous.PacPlay"
+    }
   }
 }
