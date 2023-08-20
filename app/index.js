@@ -3,11 +3,15 @@
 //android 63977248527-dhjam7h58jk4ltfmd2mm25kkbo0mtceo.apps.googleusercontent.com
 
 import React, { Component } from 'react';
-import { View, Text, ImageBackground, Image, StyleSheet} from 'react-native';
-import { Link } from 'expo-router';
+import { View, Text, ImageBackground, Image, StyleSheet, TouchableOpacity} from 'react-native';
+import { Link, router, Stack } from 'expo-router';
 import * as WebBrowser from "expo-web-browser";
 import * as Google from "expo-auth-session/providers/google";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
+//import { NavigationContainer } from '@react-navigation/native';
+//import { createNativeStackNavigator } from '@react-navigation/native-stack';
+
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -17,8 +21,9 @@ class Index extends Component{
     }
 
     async componentDidMount(){
-        let userinfo = await AsyncStorage.getItem('user');
-        console.log(userinfo);
+        //await AsyncStorage.multiRemove(['userdata', 'user']);
+        let userinfo = await AsyncStorage.getItem('userdata');
+        console.log('index'+userinfo);
         this.setState({userInfo: userinfo});
     }
 
@@ -26,9 +31,12 @@ class Index extends Component{
         return(
             <View style={styles.container}>
                 <ImageBackground style={styles.bg} source={require('./../assets/loadingbg.jpg')} resizeMode="cover">
-                    <Link style={styles.logolink} href={this.state.userInfo?'/user':'/signin'}>
+                    <TouchableOpacity 
+                        style={styles.logolink} 
+                        onPress={()=>{ this.state.userInfo ? navigation.navigate('/user/home') : navigation.navigate('first'); }}
+                    >
                         <Image style={styles.logo} source={require('./../assets/logo.png')}></Image>
-                    </Link>
+                    </TouchableOpacity>
                     <Image style={styles.iam} source={require('./../assets/itsamatch.png')}></Image>
                 </ImageBackground>
             </View>

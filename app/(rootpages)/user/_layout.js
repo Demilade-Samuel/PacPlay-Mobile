@@ -7,21 +7,37 @@ const RootLayout = () => {
 
     return(
         <Tabs screenOptions={{tabBarStyle: ScreenOptions.tabBarStyle, tabBarItemStyle: ScreenOptions.tabBarItemStyle, tabBarShowLabel:false }}>
-            <Tabs.Screen name="home" style={{backgroundColor:'white'}} options={{headerShown: false,
+            <Tabs.Screen name="home" style={{backgroundColor:'white'}} options={{headerShown: false, href:'/user/home',
                 tabBarIcon: ({size, focused, color})=>{ 
-                    return( <Image style={{width:size, height:size}} source={require('./../../../assets/home.png')}/>);
+                    if(focused){
+                        return(<Image style={{width:size, height:size}} source={require('./../../../assets/home1.png')}/>);
+                    }else{
+                        return(<Image style={{width:size, height:size}} source={require('./../../../assets/home.png')}/>);
+                    }   
                 } }}/>
-            <Tabs.Screen name="mybets" options={{headerShown: false,
+            <Tabs.Screen name="mybets" options={{headerShown: false,href:'/user/mybets',
                 tabBarIcon: ({size, focused, color})=>{ 
-                    return( <Image style={{width:size, height:size}} source={require('./../../../assets/game.png')}/>);
+                    if(focused){
+                        return( <Image style={{width:size, height:size}} source={require('./../../../assets/game1.png')}/>);
+                    }else{
+                        return( <Image style={{width:size, height:size}} source={require('./../../../assets/game.png')}/>);
+                    }
                 } }}/>
-            <Tabs.Screen name="wallet" options={{headerShown: false,
+            <Tabs.Screen name="wallet" options={{headerShown: false, href:'/user/wallet',
                 tabBarIcon: ({size, focused, color})=>{ 
-                    return( <Image style={{width:size, height:size}} source={require('./../../../assets/card.png')}/>);
+                    if(focused){
+                        return( <Image style={{width:size, height:size}} source={require('./../../../assets/card1.png')}/>);
+                    }else{
+                        return( <Image style={{width:size, height:size}} source={require('./../../../assets/card.png')}/>);
+                    }
                 }} }/>
-            <Tabs.Screen name="settings" options={{headerShown: false,
+            <Tabs.Screen name="settings" options={{headerShown: false, href:'/user/settings',
                 tabBarIcon: ({size, focused, color})=>{ 
-                    return( <Image style={{width:size, height:size}} source={require('./../../../assets/settings.png')}/>);
+                    if(focused){
+                        return( <Image style={{width:size, height:size}} source={require('./../../../assets/settings1.png')}/>);
+                    }else{
+                        return( <Image style={{width:size, height:size}} source={require('./../../../assets/settings.png')}/>);
+                    }
                 }} }/>
         </Tabs>
     )

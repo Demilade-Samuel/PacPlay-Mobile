@@ -1,122 +1,122 @@
 import React, { Component }  from 'react';
-import * as Font from 'expo-font';
-import { View, Text, ScrollView, ActivityIndicator, Image, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, ScrollView, ActivityIndicator, Image, TextInput, TouchableOpacity, Dimensions } from 'react-native';
 
 class CreateGame extends Component{
     state={
-        loading: true,
-        psnid:'',
+        psnid: '',
         stake: '',
-    }
-
-    async componentDidMount(){
-        await Font.loadAsync({
-            'ChakraPetchBold': require('./../../../../assets/fonts/ChakraPetch-SemiBold.ttf'),
-            'ChakraPetchRegular': require('./../../../../assets/fonts/ChakraPetch-Regular.ttf'),
-        });
-        while(!Font.isLoaded('ChakraPetchBold') && !Font.isLoaded('ChakraPetchRegular')){
-            continue;
-        }
-        this.setState({loading: false});
     }
 
     render(){
         return(
-            <View>
-                <ActivityIndicator style={{display: this.state.loading?'flex':'none'}}></ActivityIndicator>
-                <View style={{display: !this.state.loading?'flex':'none'}}>
-                    <Image source={require('./../../../../assets/gameback.png')}></Image>
-                    <Text>Create Game</Text>
+            <View style={{flexDirection:'column', alignItems:'flex-start', justifyContent:'flex-start'}}>
+                <ActivityIndicator style={{display:'none', position:'absolute', top: Dimensions.get('window').height*0.45,  left: Dimensions.get('window').width*0.48}}></ActivityIndicator>
+                <View style={{display:'flex', flexDirection:'row', alignItems:'center', justifyContent:'flex-start', marginTop:20}}>
+                    <Image style={{marginLeft:10}} source={require('./../../../../assets/gameback.png')}></Image>
+                    <Text style={{fontFamily:'Chakra Petch SemiBold', fontSize:24, marginLeft:108}}>Create Game</Text>
                 </View>
-                <ScrollView style={{display: !this.state.loading?'flex':'none'}}>
-                    <View>
-                        <Text>Input the PSN ID of a player in the game you want to create</Text>
+                <ScrollView style={{display:'flex', marginTop:30, width: Dimensions.get('window').width}} horizontal
+                    showsHorizontalScrollIndicator={false} decelerationRate={0} snapToInterval={Dimensions.get('window').width} snapToAlignment={"center"} scrollEnabled={true}>
+                    <View style={{paddingLeft:24, paddingRight:24, width: Dimensions.get('window').width, marginTop:40}}>
+                        <Text style={{fontFamily:'Chakra Petch Regular', color:'#646060', fontSize:16}}>Input the PSN ID of a player in the game you want to create</Text>
                         <TextInput
                             placeholder={'PSN ID'}
                             value={this.state.psnid}
                             onChangeText={(e)=>{this.setState({psnid: e});}}
+                            style={{marginTop:85, width:362, borderRadius:8, height:56, borderWidth:1, borderLeftColor:'#928E8E', fontSize:30, fontFamily:'Chakra Petch SemiBold', paddingLeft:15, paddingRight:15}}
                         />
-                        <TouchableOpacity><Text>Proceed</Text></TouchableOpacity>
+                        <TouchableOpacity style={{flexDirection:'row', alignItems:'center', justifyContent:'center', backgroundColor:'#928E8E', width:362, height:56, borderRadius:6, marginTop:165}}>
+                            <Text style={{color:'white', fontFamily:'Chakra Petch Regular', fontSize:15}}>Proceed</Text>
+                        </TouchableOpacity>
                     </View>
                     
-                    <View>
-                        <View>
-                            <Text>Game Code: 12ec4gh73m</Text>
-                            <Image source={require('./../../../../assets/copy.png')}/>
+                    <View style={{ width: Dimensions.get('window').width, alignItems:'center'}}>
+                        <View style={{flexDirection:'row', justifyContent:'flex-start', alignItems:'center', width:382}}>
+                            <Text style={{fontFamily:'Chakra Petch SemiBold', fontSize:18}}>Game Code: 12ec4gh73m</Text>
+                            <Image style={{marginLeft:10, width:20, height:20}} source={require('./../../../../assets/copy.png')}/>
                         </View>
-                        <View>
+                        <View style={{marginTop:9, width:382, height:198}}>
                             <Image source={require('./../../../../assets/gamebg.png')}/>
-                            <View>
-                                <Text>Game Details</Text>
-                                <View>
-                                    <View>
-                                        <Text>Player1</Text>
+                            <View style={{position:'absolute', width:382, height:198, flexDirection:'column', alignItems:'center', justifyContent:'flex-start'}}>
+                                <Text style={{marginTop:28, color:'white', fontSize:16, fontFamily:'Chakra Petch Regular'}}>Game Details</Text>
+                                <View style={{marginTop:36, flexDirection:'row', alignItems:'center', justifyContent:'space-around', width:342, height:80}}>
+                                    <View style={{flexDirection:'column', alignItems:'center', justifyContent:'space-between', height:80}}>
+                                        <Text style={{color:'white', fontFamily:'Chakra Petch SemiBold', fontSize:18}}>Player1</Text>
                                         <Image source={require('./../../../../assets/player1.png')}/>
                                     </View>
-                                    <Text>VS</Text>
-                                    <View>
-                                        <Text>Player2</Text>
+                                    <Text style={{color:'white', fontFamily:'Chakra Petch SemiBold', fontSize:24}}>VS</Text>
+                                    <View style={{flexDirection:'column', alignItems:'center', justifyContent:'space-between', height:80}}>
+                                        <Text style={{color:'white', fontFamily:'Chakra Petch SemiBold', fontSize:18}}>Player2</Text>
                                         <Image source={require('./../../../../assets/player2.png')}/>
                                     </View>
                                 </View>  
                             </View>
                         </View>
-                        <View>
-                            <TouchableOpacity><Text>Player1 wins</Text></TouchableOpacity>
-                            <TouchableOpacity><Text>Ends as draw</Text></TouchableOpacity>
-                            <TouchableOpacity><Text>Player2 wins</Text></TouchableOpacity>
+                        <View style={{width:382, marginTop:30, flexDirection:'row', alignItems:'center', justifyContent:'space-around'}}>
+                            <TouchableOpacity style={{backgroundColor:'rgba(15,25,166,0.3)', padding:10, borderRadius:5 }}>
+                                <Text style={{fontFamily:'Chakra Petch Regular', fontSize:14, color:'#0F19A6'}}>Player1 wins</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={{backgroundColor:'rgba(146,142,142,0.3)', padding:10, borderRadius:5 }}>
+                                <Text style={{fontFamily:'Chakra Petch Regular', fontSize:14, color:'#928E8E'}}>Ends as draw</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={{backgroundColor:'rgba(244,25,25,0.3)', padding:10, borderRadius:5 }}>
+                                <Text style={{fontFamily:'Chakra Petch Regular', fontSize:14, color:'#F41919'}}>Player2 wins</Text>
+                            </TouchableOpacity>
                         </View>
-                        <View>
-                            <Text>Stake</Text>
-                            <View>
-                                <Image source={'./../../../../assets/naira.png'} />
+                        <View style={{marginTop:31, flexDirection:'column', justifyContent:'flex-start', alignItems:'flex-start'}}>
+                            <Text style={{fontFamily:'Chakra Petch Regular', fontSize:18, color:'#646060'}}>Stake</Text>
+                            <View style={{flexDirection:'row', alignItems:'center', justifyContent:'flex-start', width:382, height:56, borderWidth:1, borderLeftColor:'black', borderRadius:8, paddingLeft:15, paddingRight:15}}>
+                                <Image style={{width:24, height:24}} source={'./../../../../assets/naira.png'} />
                                 <TextInput
                                     onChangeText={(e)=>{this.setState({stake: e});}}
                                     value={this.state.stake}
                                     keyboardType='numeric'
+                                    style={{marginLeft:10, height:56, width:358, outlineStyle:'none', fontSize:30, fontFamily:'Chakra Petch SemiBold'}}
                                 />
                             </View>
                         </View>
-                        <TouchableOpacity>
-                            <Text>Confirm</Text>
+                        <TouchableOpacity style={{flexDirection:'row', alignItems:'center', justifyContent:'center', backgroundColor:'black', width:362, height:56, borderRadius:6, marginTop:35}}>
+                            <Text style={{color:'white', fontFamily:'Chakra Petch Regular', fontSize:15}}>Confirm</Text>
                         </TouchableOpacity>
                     </View>
 
-                    <View>
-                        <View>
-                            <Text>Game Code: 12ec4gh73m</Text>
-                            <Image source={require('./../../../../assets/copy.png')}/>
+                    <View style={{ width: Dimensions.get('window').width, alignItems:'center'}}>
+                        <View style={{flexDirection:'row', justifyContent:'flex-start', alignItems:'center', width:382}}>
+                            <Text style={{fontFamily:'Chakra Petch SemiBold', fontSize:18}}>Game Code: 12ec4gh73m</Text>
+                            <Image style={{marginLeft:10, width:20, height:20}} source={require('./../../../../assets/copy.png')}/>
                         </View>
-                        <View>
+                        <View style={{marginTop:9, width:382, height:198}}>
                             <Image source={require('./../../../../assets/gamebg.png')}/>
-                            <View>
-                                <Text>Game Details</Text>
-                                <View>
-                                    <View>
-                                        <Text>Player1</Text>
+                            <View style={{position:'absolute', width:382, height:198, flexDirection:'column', alignItems:'center', justifyContent:'flex-start'}}>
+                                <Text style={{marginTop:28, color:'white', fontSize:16, fontFamily:'Chakra Petch Regular'}}>Game Details</Text>
+                                <View style={{marginTop:36, flexDirection:'row', alignItems:'center', justifyContent:'space-around', width:342, height:80}}>
+                                    <View style={{flexDirection:'column', alignItems:'center', justifyContent:'space-between', height:80}}>
+                                        <Text style={{color:'white', fontFamily:'Chakra Petch SemiBold', fontSize:18}}>Player1</Text>
                                         <Image source={require('./../../../../assets/player1.png')}/>
                                     </View>
-                                    <Text>VS</Text>
-                                    <View>
-                                        <Text>Player2</Text>
+                                    <Text style={{color:'white', fontFamily:'Chakra Petch SemiBold', fontSize:24}}>VS</Text>
+                                    <View style={{flexDirection:'column', alignItems:'center', justifyContent:'space-between', height:80}}>
+                                        <Text style={{color:'white', fontFamily:'Chakra Petch SemiBold', fontSize:18}}>Player2</Text>
                                         <Image source={require('./../../../../assets/player2.png')}/>
                                     </View>
                                 </View>  
                             </View>
                         </View>
-                        <View>
-                            <Text>Total Stakes</Text>
-                            <Text>NGN 2,000</Text>
+                        <View style={{width:382, flexDirection:'column', alignItems:'center', justifyContent:'flex-start', marginTop:15}}>
+                            <Text style={{fontFamily:'Chakra Petch Regular', fontSize:16, color:'#928E8E'}}>Total Stakes</Text>
+                            <Text style={{fontFamily:'Chakra Petch SemiBold', fontSize:24, color:'#124D07'}}>NGN 2,000</Text>
                         </View>
-                        <ScrollView>
-                            <Text>You staked NGN 200 on Player1 to win</Text>
-                            <Text>Ayo joined the game</Text>
-                            <Text>Ayo staked NGN 350 on Player1 to win</Text>
-                            <Text>Jeffrey joined the game</Text>
-                            <Text>Jeffrey staked NGN 250 on Player1 to win</Text>
+                        <ScrollView style={{marginTop:20, width:382, height:160, borderWidth:1, borderLeftColor:'#928E8E', padding:10}}>
+                            <Text style={{fontFamily:'Chakra Petch Regular', fontSize:16, marginBottom:3}}>You staked NGN 200 on Player1 to win</Text>
+                            <Text style={{fontFamily:'Chakra Petch Regular', fontSize:16, marginBottom:3}}>Ayo joined the game</Text>
+                            <Text style={{fontFamily:'Chakra Petch Regular', fontSize:16, marginBottom:3}}>Ayo staked NGN 350 on Player1 to win</Text>
+                            <Text style={{fontFamily:'Chakra Petch Regular', fontSize:16, marginBottom:3}}>Jeffrey joined the game</Text>
+                            <Text style={{fontFamily:'Chakra Petch Regular', fontSize:16, marginBottom:3}}>Jeffrey staked NGN 250 on Player1 to win</Text>
                         </ScrollView>
 
-                        <TouchableOpacity><Text>Start Game</Text></TouchableOpacity>
+                        <TouchableOpacity style={{flexDirection:'row', alignItems:'center', justifyContent:'center', backgroundColor:'#928E8E', width:362, height:56, borderRadius:6, marginTop:45}}>
+                            <Text style={{color:'white', fontFamily:'Chakra Petch Regular', fontSize:15}}>Start Game</Text>
+                        </TouchableOpacity>
                     </View>
                 </ScrollView>
             </View>

@@ -16,13 +16,12 @@ export default function GoogleLoginButton(props){
     });
 
     useEffect(()=>{
-        console.log(props.Font.FontDisplay[0]);
         handleSigninWithGoogle();
     }, [response]);
 
     async function handleSigninWithGoogle(){
         const user = await AsyncStorage.getItem('user');
-        console.log(user);
+        //console.log('>>>'+user);
         if(!user){
             if(response?.type === "success"){
                 await getUserInfo(response.authentication.accessToken);
@@ -30,24 +29,46 @@ export default function GoogleLoginButton(props){
             
         }else{
             setUserInfo(JSON.parse(user));
+            console.log(user);
+            backendComm(user);
+            
         }
     }
+
+    backendComm = (user) => {
+        console.log('hiii');
+        const response = fetch(
+            "http://localhost:3000/loginauthentication",
+            {
+                method: 'POST',
+                body: user,
+                headers: { 'Content-Type': 'application/json' }
+            }  
+        ).then(response=>{
+            return response.json();
+        }).then(response=>{
+            props.navigate(response);
+            console.log(response);
+        });
+    } 
 
     const getUserInfo = async (token) => {
         if(!token) return;
 
         try{
-            const response = await fetch(
+            const response = fetch(
                 "https://www.googleapis.com/userinfo/v2/me",
                 {
                     headers: {Authorization: `Bearer ${token}`}
                 }
-            );
-            const user = await response.json();
-            console.log(user);
-            await AsyncStorage.setItem('user', JSON.stringify(user));
-            
-            setUserInfo(user);
+            ).then(response=>{
+                return response.json();
+            }).then(async response=>{
+                await AsyncStorage.setItem('user', JSON.stringify(response));
+                let user = await AsyncStorage.getItem('user');
+                setUserInfo(user);
+                backendComm(user);
+            });
         } catch(error){
             console.log(error);
         }
@@ -56,7 +77,7 @@ export default function GoogleLoginButton(props){
     return(
         <TouchableOpacity onPress={()=>{promptAsync()}} style={{flexDirection:'row', alignItems: 'center', justifyContent: 'center', marginTop:10}}>
             <Image style={{width:240, height:41}} source={require('./../assets/whiterect.png')}/>
-            <Text style={{ position:'absolute', fontFamily: props.Font.isLoaded('ChakraPetchRegular')?props.Font.processFontFamily('ChakraPetchRegular'):'', color:'black'}}>Login with Google</Text>
+            <Text style={{ position:'absolute', fontFamily:'Chakra Petch Regular', color:'black'}}>Login with Google</Text>
         </TouchableOpacity>
     );
 }
