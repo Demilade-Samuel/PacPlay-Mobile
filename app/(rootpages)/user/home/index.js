@@ -5,6 +5,18 @@ import VirtualCard from '../../../../components/virtualcard';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
 
+/* 
+    AsyncStorage Structures
+    userdata<<<<
+    -userid
+    -email
+    -username
+    -fullname
+    -wallet
+    -picture
+
+*/
+
 class Home extends Component {
     state={
         loading: true,
@@ -14,13 +26,27 @@ class Home extends Component {
     async componentDidMount(){
         let data = await AsyncStorage.getItem('userdata');
         data = JSON.parse(data);
-        console.log(data);
-        
+        console.log('>>'+data.userid);
+        //If user data is in Async Storage
         if(data){
-            this.setState({userdata: data, loading:false});
-        }else{
+            //A default call to the server to get user details, incase there are any updates
+            const defrequest = fetch(
+                "http://localhost:3000/getuserdata",
+                {
+                    method: 'POST',
+                    body: JSON.stringify({userid: data.userid}),
+                    headers: { 'Content-Type': 'application/json' }
+                }
+            ).then(response => {
+                return response.json();
+            }).then(response => {
+                console.log(response.data);
+                this.setState({userdata: response.data, loading:false}); 
+            });
+        
+        }else{ //We dont know how this person got to this URL so we take them back to first
             await AsyncStorage.multiRemove(['userdata', 'user']);
-            router.push({pathname:'/signin'})
+            router.push({pathname:'/first'})
         }
     }
 
@@ -30,11 +56,11 @@ class Home extends Component {
                 <ActivityIndicator style={{display:this.state.loading?'flex':'none', position:'absolute', top: Dimensions.get('window').height*0.45,  left: Dimensions.get('window').width*0.48}}></ActivityIndicator>
                 <View style={{display:!this.state.loading?'flex':'none', ...styles.mainView}}>
                     <Header
-                        username={this.state.userdata.username}
+                        username={this.state.userdata.username?this.state.userdata.username:''}
                     />
                     
                     <VirtualCard
-                        wallet={this.state.userdata.wallet}
+                        wallet={this.state.userdata.wallet?this.state.userdata.wallet:''}
                     />
                     
                     <View style={{width:400, height:80, marginTop:70, flexDirection:'row', alignItems:'center', justifyContent:'space-between'}}>

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { View, Text, Image, StyleSheet, Dimensions } from 'react-native';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 
 class Header extends Component{
     state={
@@ -9,10 +10,10 @@ class Header extends Component{
     render(){
         return(
             <View style={{...styles.viewTop}}>
-                <View style={{...styles.viewTL}}>
+                <TouchableOpacity style={{...styles.viewTL}} onPress={()=>{ navigation.navigate('/user/home/profile'); }}>
                     <Image style={{width:40, height:40, borderRadius:'50%', marginRight:10}} source={{uri:'https://lh3.googleusercontent.com/a/AAcHTtd0T2Z9BXfB350McjCdHFVkoySPGdcJ7GG4JmgNS_28Q7I=s96-c'}}></Image>
                     <Text style={{fontFamily:'Chakra Petch SemiBold', fontSize:18}}>{this.props.username}</Text>
-                </View>
+                </TouchableOpacity>
                 <View style={{flexDirection:'row', alignItems:'flex-start', justifyContent:'flex-end'}}>
                     <Image source={require('./../assets/notification.png')}></Image>
                     <Image style={{position:'absolute', right:5}} source={require('./../assets/reddot.png')}></Image>

@@ -11,7 +11,9 @@ class Help extends Component{
         return(
             <View>
                 <View style={{display:'flex', flexDirection:'row', alignItems:'center', justifyContent:'flex-start', marginTop:20}}>
+                    <TouchableOpacity onPress={()=>{navigation.navigate('/user/settings');}}>
                     <Image style={{marginLeft:10}} source={require('./../../../../assets/gameback.png')}></Image>
+                    </TouchableOpacity>
                     <Text style={{fontFamily:'Chakra Petch SemiBold', fontSize:24, marginLeft:88}}>{'Help & Support'}</Text>
                 </View>
                 

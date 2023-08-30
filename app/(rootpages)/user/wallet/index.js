@@ -7,7 +7,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 class Wallet extends Component{
     state={
         loading:true,
-        userdata: {}
+        userdata: {},
     }
 
     async componentDidMount(){
@@ -15,10 +15,23 @@ class Wallet extends Component{
         data = JSON.parse(data);
         
         if(data){
-            this.setState({userdata: data, loading:false});
-        }else{
+            //A default call to the server to get user details, incase there are any updates
+            const defrequest = fetch(
+                "http://localhost:3000/getuserdata",
+                {
+                    method: 'POST',
+                    body: JSON.stringify({userid: data.userid}),
+                    headers: { 'Content-Type': 'application/json' }
+                }
+            ).then(response => {
+                return response.json();
+            }).then(response => {
+                this.setState({userdata: response.data, loading:false}); 
+            });
+        
+        }else{ //We dont know how this person got to this URL so we take them back to first
             await AsyncStorage.multiRemove(['userdata', 'user']);
-            router.push({pathname:'/signin'})
+            router.push({pathname:'/first'})
         }
     }
     
@@ -30,29 +43,39 @@ class Wallet extends Component{
                     <Header
                         username={this.state.userdata.username}
                     />
+
+                    <Text style={{display:this.state.userdata.email?'none':'flex', marginTop:10, fontFamily:'Chakra Petch SemiBold', fontSize:16, paddingTop:8, paddingBottom:8, paddingLeft:15, paddingRight:15, color:'red', borderRadius:8, borderWidth:2, borderLeftColor:'red', borderRightColor:'red', borderTopColor:'red', borderBottomColor:'red', textAlign:'center'}}>The 'wallet tab' is not accesible to you until you have a verified email</Text>
+                    
                     <VirtualCard
                         wallet={this.state.userdata.wallet}
                     />
 
-                    <View style={{flexDirection:'column', alignItems:'flex-start', justifyContent:'flex-start', marginTop:75}}>
-                        <TouchableOpacity onPress={()=>{navigation.navigate('/user/wallet/deposit');}} style={{width:366, height:80, flexDirection:'row', alignItems:'center', justifyContent:'space-between', borderWidth:1, borderLeftColor:'rgba(0,0,0,0)', borderTopColor:'rgba(0,0,0,0)', borderRightColor:'rgba(0,0,0,0)', borderBottomColor:'#C8D1DB'}}>
+                    <View style={{flexDirection:'column', alignItems:'flex-start', justifyContent:'flex-start', marginTop:55}}>
+                        <TouchableOpacity onPress={()=>{ this.state.userdata.email? navigation.navigate('/user/wallet/deposit') :''; }} style={{width:366, height:80, flexDirection:'row', alignItems:'center', justifyContent:'space-between', borderWidth:1, borderLeftColor:'rgba(0,0,0,0)', borderTopColor:'rgba(0,0,0,0)', borderRightColor:'rgba(0,0,0,0)', borderBottomColor:'#C8D1DB'}}>
                             <View style={{flexDirection:'row', alignItems:'center', justifyContent:'flex-start'}}>
                                 <Image style={{marginRight:12}} source={require('./../../../../assets/deposit.png')}/>
                                 <Text style={{fontFamily:'Chakra Petch Regular', color:'#646863', fontSize:18}}>Deposit</Text>
                             </View>
                             <Image source={require('./../../../../assets/next.png')}/>
                         </TouchableOpacity>
-                        <TouchableOpacity onPress={()=>{navigation.navigate('/user/wallet/withdraw');}} style={{width:366, height:80, flexDirection:'row', alignItems:'center', justifyContent:'space-between', borderWidth:1, borderLeftColor:'rgba(0,0,0,0)', borderTopColor:'rgba(0,0,0,0)', borderRightColor:'rgba(0,0,0,0)', borderBottomColor:'#C8D1DB'}}>
+                        <TouchableOpacity onPress={()=>{ this.state.userdata.email? navigation.navigate('/user/wallet/withdraw') :'';}} style={{width:366, height:80, flexDirection:'row', alignItems:'center', justifyContent:'space-between', borderWidth:1, borderLeftColor:'rgba(0,0,0,0)', borderTopColor:'rgba(0,0,0,0)', borderRightColor:'rgba(0,0,0,0)', borderBottomColor:'#C8D1DB'}}>
                             <View style={{flexDirection:'row', alignItems:'center', justifyContent:'flex-start'}}>
                                 <Image style={{marginRight:12}} source={require('./../../../../assets/withdraw.png')}/>
                                 <Text style={{fontFamily:'Chakra Petch Regular', color:'#646863', fontSize:18}}>Withdraw</Text>
                             </View>
                             <Image source={require('./../../../../assets/next.png')}/>
                         </TouchableOpacity>
-                        <TouchableOpacity onPress={()=>{navigation.navigate('/user/wallet/billpayment');}} style={{width:366, height:80, flexDirection:'row', alignItems:'center', justifyContent:'space-between', borderWidth:1, borderLeftColor:'rgba(0,0,0,0)', borderTopColor:'rgba(0,0,0,0)', borderRightColor:'rgba(0,0,0,0)', borderBottomColor:'#C8D1DB'}}>
+                        <TouchableOpacity onPress={()=>{ this.state.userdata.email? navigation.navigate('/user/wallet/billpayment') :'';}} style={{width:366, height:80, flexDirection:'row', alignItems:'center', justifyContent:'space-between', borderWidth:1, borderLeftColor:'rgba(0,0,0,0)', borderTopColor:'rgba(0,0,0,0)', borderRightColor:'rgba(0,0,0,0)', borderBottomColor:'#C8D1DB'}}>
                             <View style={{flexDirection:'row', alignItems:'center', justifyContent:'flex-start'}}>
                                 <Image style={{marginRight:12}} source={require('./../../../../assets/bills.png')}/>
                                 <Text style={{fontFamily:'Chakra Petch Regular', color:'#646863', fontSize:18}}>Bill Payments</Text>
+                            </View>
+                            <Image source={require('./../../../../assets/next.png')}/>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={()=>{ this.state.userdata.email? navigation.navigate('/user/wallet/billpayment') :'';}} style={{width:366, height:80, flexDirection:'row', alignItems:'center', justifyContent:'space-between', borderWidth:1, borderLeftColor:'rgba(0,0,0,0)', borderTopColor:'rgba(0,0,0,0)', borderRightColor:'rgba(0,0,0,0)', borderBottomColor:'rgba(0,0,0,0)'}}>
+                            <View style={{flexDirection:'row', alignItems:'center', justifyContent:'flex-start'}}>
+                                <Image style={{marginRight:12}} source={require('./../../../../assets/bills.png')}/>
+                                <Text style={{fontFamily:'Chakra Petch Regular', color:'#646863', fontSize:18}}>Transactions</Text>
                             </View>
                             <Image source={require('./../../../../assets/next.png')}/>
                         </TouchableOpacity>

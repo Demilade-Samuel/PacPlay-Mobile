@@ -2,20 +2,51 @@ import React, { Component } from 'react';
 import { View, Text, StyleSheet, Dimensions, ActivityIndicator, Image, TouchableOpacity, ScrollView} from 'react-native';
 import * as Font from 'expo-font';
 import Header from '../../../../components/header';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 class MyBets extends Component{
     state={
-        activeTab: 'open'
+        loading:true,
+        activeTab: 'open',
+        userdata: {},
+    }
+
+    async componentDidMount(){
+        let data = await AsyncStorage.getItem('userdata');
+        data = JSON.parse(data);
+        
+        if(data){
+            //A default call to the server to get user details, incase there are any updates
+            const defrequest = fetch(
+                "http://localhost:3000/getuserdata",
+                {
+                    method: 'POST',
+                    body: JSON.stringify({userid: data.userid}),
+                    headers: { 'Content-Type': 'application/json' }
+                }
+            ).then(response => {
+                return response.json();
+            }).then(response => {
+                console.log(response.data);
+                this.setState({userdata: response.data, loading:false}); 
+            });
+        
+        }else{ //We dont know how this person got to this URL so we take them back to first
+            await AsyncStorage.multiRemove(['userdata', 'user']);
+            router.push({pathname:'/first'})
+        }
     }
 
     render(){
         return(
             <ScrollView style={styles.containerView} horizontal showsHorizontalScrollIndicator={false} decelerationRate={0} snapToInterval={Dimensions.get('window').width} snapToAlignment={"center"} scrollEnabled={true}>
                 
-                <ActivityIndicator style={{display:'none', position:'absolute', top: Dimensions.get('window').height*0.45,  left: Dimensions.get('window').width*0.48}}></ActivityIndicator>
+                <ActivityIndicator style={{display:this.state.loading?'flex':'none', position:'absolute', top: Dimensions.get('window').height*0.45,  left: Dimensions.get('window').width*0.48}}></ActivityIndicator>
                 
-                <View style={{display:'flex', ...styles.mainView}}>
-                    <Header/>
+                <View style={{display:!this.state.loading?'flex':'none', ...styles.mainView}}>
+                    <Header
+                        username={this.state.userdata.username}
+                    />
                     
                     <View style={styles.navContainer}>
                         <TouchableOpacity style={{width:100, height:42, flexDirection:'row', justifyContent:'center', alignItems:'center', backgroundColor:this.state.activeTab==='open'?'#111111':'rgba(0,0,0,0)', borderRadius:4}}>
@@ -70,7 +101,7 @@ class MyBets extends Component{
                     </ScrollView>
                 </View>
 
-                <View style={{display:'flex', ...styles.detailsView}}>
+                <View style={{display:!this.state.loading?'flex':'none', ...styles.detailsView}}>
                     <View style={{display:'flex', flexDirection:'row', alignItems:'center', justifyContent:'flex-start', marginTop:20, width:Dimensions.get('window').width}}>
                         <Image style={{marginLeft:10}} source={require('./../../../../assets/gameback.png')}></Image>
                         <Text style={{fontFamily:'Chakra Petch SemiBold', fontSize:24, marginLeft:108}}>Bet Details</Text>

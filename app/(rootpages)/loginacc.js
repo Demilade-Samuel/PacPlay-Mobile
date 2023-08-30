@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { Component } from 'react';
-import { View, Text, Image, TextInput, TouchableOpacity, Dimensions } from 'react-native';
+import { View, Text, Image, TextInput, TouchableOpacity, Dimensions, ActivityIndicator } from 'react-native';
 
 class LoginAcc extends Component{
     state={
@@ -8,39 +8,43 @@ class LoginAcc extends Component{
         usernamewarning:'',
         password:'',
         passwordwarning:'',
-        pass1toggle:'Show Password'
+        pass1toggle:'Show Password',
+        reqloading: false
     }
 
     loginaccount = () => {
-        this.setState({usenamewarning:'', passwordwarning:''});
-        if(this.state.password!=='' && this.state.username!=='' ){
-            let data = {
-                username: this.state.username,
-                password: this.state.password
-            }
-
-            console.log(data);
-
-            const response = fetch(
-                "http://localhost:3000/loginaccount",
-                {
-                    method: 'POST',
-                    body: JSON.stringify(data),
-                    headers: { 'Content-Type': 'application/json' }
-                }  
-            ).then(response=>{
-                return response.json();
-            }).then(async response=>{
-                if(response.msg === 'Wrong credentials'){
-                    this.setState({usernamewarning:'Wrong credentials', passwordwarning:'Wrong credentials'});
-                }else{
-                    await AsyncStorage.setItem('userdata', JSON.stringify(response.data));
-                    navigation.navigate('/user/home');
+        if(!this.state.reqloading){
+            this.setState({usenamewarning:'', passwordwarning:''});
+            if(this.state.password!=='' && this.state.username!=='' ){
+                let data = {
+                    username: this.state.username,
+                    password: this.state.password
                 }
-            });
-        }else{
-            if(this.state.username===''){ this.setState({usernamewarning:'This field cannot be empty'}); } 
-            if(this.state.password===''){ this.setState({passwordwarning:'This field cannot be empty'}); }
+
+                console.log(data);
+                this.setState({reqloading: true});
+                const response = fetch(
+                    "http://localhost:3000/loginaccount",
+                    {
+                        method: 'POST',
+                        body: JSON.stringify(data),
+                        headers: { 'Content-Type': 'application/json' }
+                    }  
+                ).then(response=>{
+                    return response.json();
+                }).then(async response=>{
+                    if(response.msg === 'Wrong credentials'){
+                        this.setState({usernamewarning:'Wrong credentials', passwordwarning:'Wrong credentials', reqloading: false});
+                    }else{
+                        await AsyncStorage.setItem('userdata', JSON.stringify(response.data));
+                        navigation.navigate('/user/home');
+                        this.setState({reqloading: false});
+                    }
+                });
+            }else{
+                if(this.state.username===''){ this.setState({usernamewarning:'This field cannot be empty'}); } 
+                if(this.state.password===''){ this.setState({passwordwarning:'This field cannot be empty'}); }
+            }
         }
     }
 
@@ -88,7 +92,8 @@ class LoginAcc extends Component{
                     </View>
 
                     <TouchableOpacity style={{width:Dimensions.get('window').width-36, height:56, flexDirection:'row', alignItems:'center', justifyContent:'center', borderRadius:8, marginTop:120, backgroundColor:'black'}} onPress={()=>{this.loginaccount();}}>
-                        <Text style={{color:'white', fontFamily:'Chakra Petch Regular', fontSize:16}}>Login</Text>
+                        <Text style={{display:!this.state.reqloading?'flex':'none', color:'white', fontFamily:'Chakra Petch Regular', fontSize:16}}>Login</Text>
+                        <ActivityIndicator style={{display:this.state.reqloading?'flex':'none'}} color="white"></ActivityIndicator>
                     </TouchableOpacity>
                 </View>
             </View>

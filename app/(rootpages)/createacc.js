@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { Component } from 'react';
 import { View, Text, Image, TextInput, TouchableOpacity, Dimensions } from 'react-native';
+import { ActivityIndicator } from 'react-native-web';
 
 class CreateAcc extends Component{
     state={
@@ -11,44 +12,49 @@ class CreateAcc extends Component{
         pass2toggle: 'Show password',
         usernamewarning:'',
         pass1warning:'',
-        pass2warning:''
+        pass2warning:'',
+        reqloading: false
     }
 
     createaccount = () => {
-        this.setState({usernamewarning:'', pass1warning:'', pass2warning:''});
-        if(this.state.username!=='' && this.state.password!=='' && this.state.passwordconfirm!==''){
-            if(this.state.password === this.state.passwordconfirm){
-                let data = {
-                    username: this.state.username,
-                    password: this.state.password
-                }
-    
-                console.log(data);
-    
-                const response = fetch(
-                    "http://localhost:3000/createaccount",
-                    {
-                        method: 'POST',
-                        body: JSON.stringify(data),
-                        headers: { 'Content-Type': 'application/json' }
-                    }  
-                ).then(response=>{
-                    return response.json();
-                }).then(async response=>{
-                    if(response.msg==='Username already exists'){
-                        this.setState({usernamewarning:'Username already exists'});
-                    }else{
-                        await AsyncStorage.setItem('userdata', JSON.stringify(response.data));
-                        navigation.navigate('/user/home');
+        if(!this.state.reqloading){  
+            this.setState({usernamewarning:'', pass1warning:'', pass2warning:''});
+            
+            if(this.state.username!=='' && this.state.password!=='' && this.state.passwordconfirm!==''){
+                if(this.state.password === this.state.passwordconfirm){
+                    let data = {
+                        username: this.state.username,
+                        password: this.state.password
                     }
-                });
+        
+                    console.log(data);
+                    this.setState({reqloading:true});
+                    const response = fetch(
+                        "http://localhost:3000/createaccount",
+                        {
+                            method: 'POST',
+                            body: JSON.stringify(data),
+                            headers: { 'Content-Type': 'application/json' }
+                        }  
+                    ).then(response=>{
+                        return response.json();
+                    }).then(async response=>{
+                        if(response.msg==='Username already exists'){
+                            this.setState({usernamewarning:'Username already exists', reqloading:false});
+                        }else{
+                            await AsyncStorage.setItem('userdata', JSON.stringify(response.data));
+                            navigation.navigate('/user/home');
+                            this.setState({reqloading:false});
+                        }
+                    });
+                }else{
+                    this.setState({pass1warning:'Passwords not similar', pass2warning:'Passwords not similar'});
+                }
             }else{
-                this.setState({pass1warning:'Passwords not similar', pass2warning:'Passwords not similar'});
+                if(this.state.username===''){ this.setState({usernamewarning:'This field cannot be empty'}); }
+                if(this.state.password===''){ this.setState({pass1warning:'This field cannot be empty'}); }
+                if(this.state.passwordconfirm===''){ this.setState({pass2warning:'This field cannot be empty'}); }
             }
-        }else{
-            if(this.state.username===''){ this.setState({usernamewarning:'This field cannot be empty'}); }
-            if(this.state.password===''){ this.setState({pass1warning:'This field cannot be empty'}); }
-            if(this.state.passwordconfirm===''){ this.setState({pass2warning:'This field cannot be empty'}); }
         }
     }
 
@@ -114,7 +120,8 @@ class CreateAcc extends Component{
                     </View>
 
                     <TouchableOpacity style={{width:Dimensions.get('window').width-36, height:56, flexDirection:'row', alignItems:'center', justifyContent:'center', borderRadius:8, marginTop:90, backgroundColor:'black'}} onPress={()=>{this.createaccount();}}>
-                        <Text style={{color:'white', fontFamily:'Chakra Petch Regular', fontSize:16}}>Create account</Text>
+                        <Text style={{display:!this.state.reqloading?'flex':'none', color:'white', fontFamily:'Chakra Petch Regular', fontSize:16}}>Create account</Text>
+                        <ActivityIndicator style={{display:this.state.reqloading?'flex':'none'}} color="white"></ActivityIndicator>
                     </TouchableOpacity>
                 </View>
             </View>
