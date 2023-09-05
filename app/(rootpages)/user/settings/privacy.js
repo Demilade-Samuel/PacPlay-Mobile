@@ -15,12 +15,16 @@ class Privacy extends Component{
         retypepass: '',
         retypetoggle: 'Show password',
         retypewarning: '',
-        retypecolor: ''
+        retypecolor: '',
+        screenmode:''
     }
 
     async componentDidMount(){
         let data = await AsyncStorage.getItem('userdata');
+        let screenmode = await AsyncStorage.getItem('screenmode');
         data = JSON.parse(data);
+        console.log(screenmode);
+        this.setState({screenmode: screenmode});
         console.log('>>'+data.userid);
         //If user data is in Async Storage
         if(data){
@@ -94,25 +98,25 @@ class Privacy extends Component{
 
     render(){
         return(
-            <View>
+            <View style={{width:Dimensions.get('window').width, height:Dimensions.get('window').height, backgroundColor:this.state.screenmode==='dark'?'#181818':'white'}}>
                 <View style={{display:'flex', flexDirection:'row', alignItems:'center', justifyContent:'flex-start', marginTop:20}}>
                     <TouchableOpacity onPress={()=>{navigation.navigate('/user/settings');}}>
-                    <Image style={{marginLeft:10}} source={require('./../../../../assets/gameback.png')}></Image>
+                    <Image style={{marginLeft:10}} source={this.state.screenmode==='dark'?require('./../../../../assets/gameback-dark.png'):require('./../../../../assets/gameback.png')}></Image>
                     </TouchableOpacity>
-                    <Text style={{fontFamily:'Chakra Petch SemiBold', fontSize:24, marginLeft:88}}>{'Privacy & Security'}</Text>
+                    <Text style={{fontFamily:'Chakra Petch SemiBold', fontSize:24, marginLeft:72, color:this.state.screenmode==='dark'?'white':'black'}}>{'Privacy & Security'}</Text>
                 </View>
                 <View style={{marginTop:30, marginLeft:24, marginRight:24}}>
-                    <Text style={{fontFamily:'Chakra Petch SemiBold', fontSize:20, marginBottom:20}}>Change Password</Text>
+                    <Text style={{fontFamily:'Chakra Petch SemiBold', fontSize:20, marginBottom:20, color:this.state.screenmode==='dark'?'white':'black'}}>Change Password</Text>
 
                     <View style={{marginTop:20}}>
-                        <Text style={{fontFamily:'Chakra Petch Regular', fontSize:16, color:'#646060'}}>Current Password</Text>
-                        <View style={{marginTop:10, flexDirection:'row', alignItems:'center', justifyContent:'space-between', width:378, flexWrap:'wrap', borderWidth:1, borderLeftColor:'#928E8E', borderRightColor:'#928E8E', borderTopColor:'#928E8E', borderBottomColor:'#928E8E', borderRadius:8, paddingRight:15 }}>
+                        <Text style={{fontFamily:'Chakra Petch Regular', fontSize:16, color:this.state.screenmode==='dark'?'white':'#646060'}}>Current Password</Text>
+                        <View style={{marginTop:10, flexDirection:'row', alignItems:'center', justifyContent:'space-between', width:378, flexWrap:'wrap', borderWidth:1, borderColor:this.state.screenmode==='dark'?'white':'#928E8E', borderRadius:8, paddingRight:15 }}>
                             <TextInput
                                 secureTextEntry={this.state.currenttoggle==='Hide Password'?false:true}
                                 placeholder={'Current Password'}
                                 value={ this.state.currentpass }
                                 onChangeText={(e)=>{this.setState({currentpass: e});}}
-                                style={{outlineStyle:'none', width:260, height:44, borderWidth:1, borderLeftColor:'rgba(0,0,0,0)', borderRightColor:'rgba(0,0,0,0)', borderTopColor:'rgba(0,0,0,0)', borderBottomColor:'rgba(0,0,0,0)', fontSize:18, fontFamily:'Chakra Petch Regular', paddingLeft:15, paddingRight:15}}
+                                style={{outlineStyle:'none', width:260, height:44, borderWidth:1, borderColor:'rgba(0,0,0,0)',color:this.state.screenmode==='dark'?'white':'black', fontSize:18, fontFamily:'Chakra Petch Regular', paddingLeft:15, paddingRight:15}}
                             />
                             <TouchableOpacity  onPress={()=>{ this.setState({currenttoggle: this.state.currenttoggle==='Show Password'?'Hide Password':'Show Password'}); }}>
                                 <Text style={{fontFamily:'Chakra Petch Regular', fontSize:14, color:'#4285F4'}}>{this.state.currenttoggle}</Text>
@@ -122,14 +126,14 @@ class Privacy extends Component{
                     </View>
 
                     <View style={{marginTop:25}}>
-                        <Text style={{fontFamily:'Chakra Petch Regular', fontSize:16, color:'#646060'}}>New Password</Text>
-                        <View style={{marginTop:10, flexDirection:'row', alignItems:'center', justifyContent:'space-between', width:378, flexWrap:'wrap', borderWidth:1, borderLeftColor:'#928E8E', borderRightColor:'#928E8E', borderTopColor:'#928E8E', borderBottomColor:'#928E8E', borderRadius:8, paddingRight:15 }}>
+                        <Text style={{fontFamily:'Chakra Petch Regular', fontSize:16, color:this.state.screenmode==='dark'?'white':'#646060'}}>New Password</Text>
+                        <View style={{marginTop:10, flexDirection:'row', alignItems:'center', justifyContent:'space-between', width:378, flexWrap:'wrap', borderWidth:1, borderColor:this.state.screenmode==='dark'?'white':'#928E8E', borderRadius:8, paddingRight:15 }}>
                             <TextInput
                                 secureTextEntry={this.state.newtoggle==='Hide Password'?false:true}
                                 placeholder={'New Password'}
                                 value={ this.state.newpass }
                                 onChangeText={(e)=>{this.setState({newpass: e});}}
-                                style={{outlineStyle:'none', width:260, height:44, borderWidth:1, borderLeftColor:'rgba(0,0,0,0)', borderRightColor:'rgba(0,0,0,0)', borderTopColor:'rgba(0,0,0,0)', borderBottomColor:'rgba(0,0,0,0)', fontSize:18, fontFamily:'Chakra Petch Regular', paddingLeft:15, paddingRight:15}}
+                                style={{outlineStyle:'none', width:260, height:44, borderWidth:1, borderColor:'rgba(0,0,0,0)', fontSize:18, fontFamily:'Chakra Petch Regular', paddingLeft:15, paddingRight:15, color:this.state.screenmode==='dark'?'white':'black'}}
                             />
                             <TouchableOpacity  onPress={()=>{ this.setState({newtoggle: this.state.newtoggle==='Show Password'?'Hide Password':'Show Password'}); }}>
                                 <Text style={{fontFamily:'Chakra Petch Regular', fontSize:14, color:'#4285F4'}}>{this.state.newtoggle}</Text>
@@ -139,14 +143,14 @@ class Privacy extends Component{
                     </View>
 
                     <View style={{marginTop:25}}>
-                        <Text style={{fontFamily:'Chakra Petch Regular', fontSize:16, color:'#646060'}}>Retype Password</Text>
-                        <View style={{marginTop:10, flexDirection:'row', alignItems:'center', justifyContent:'space-between', width:378, flexWrap:'wrap', borderWidth:1, borderLeftColor:'#928E8E', borderRightColor:'#928E8E', borderTopColor:'#928E8E', borderBottomColor:'#928E8E', borderRadius:8, paddingRight:15 }}>
+                        <Text style={{fontFamily:'Chakra Petch Regular', fontSize:16, color:this.state.screenmode==='dark'?'white':'#646060'}}>Retype Password</Text>
+                        <View style={{marginTop:10, flexDirection:'row', alignItems:'center', justifyContent:'space-between', width:378, flexWrap:'wrap', borderWidth:1, borderColor:this.state.screenmode==='dark'?'white':'#928E8E', borderRadius:8, paddingRight:15 }}>
                             <TextInput
                                 secureTextEntry={this.state.retypetoggle==='Hide Password'?false:true}
                                 placeholder={'Retype Password'}
                                 value={ this.state.retypepass }
                                 onChangeText={(e)=>{this.setState({retypepass: e});}}
-                                style={{outlineStyle:'none', width:260, height:44, borderWidth:1, borderLeftColor:'rgba(0,0,0,0)', borderRightColor:'rgba(0,0,0,0)', borderTopColor:'rgba(0,0,0,0)', borderBottomColor:'rgba(0,0,0,0)', fontSize:18, fontFamily:'Chakra Petch Regular', paddingLeft:15, paddingRight:15}}
+                                style={{outlineStyle:'none', width:260, height:44, borderWidth:1, borderColor:'rgba(0,0,0,0)', fontSize:18, fontFamily:'Chakra Petch Regular', paddingLeft:15, paddingRight:15, color:this.state.screenmode==='dark'?'white':'black'}}
                             />
                             <TouchableOpacity  onPress={()=>{ this.setState({retypetoggle: this.state.retypetoggle==='Show Password'?'Hide Password':'Show Password'}); }}>
                                 <Text style={{fontFamily:'Chakra Petch Regular', fontSize:14, color:'#4285F4'}}>{this.state.retypetoggle}</Text>
@@ -156,7 +160,7 @@ class Privacy extends Component{
                     </View>
 
 
-                    <TouchableOpacity style={{width:Dimensions.get('window').width-36, height:56, flexDirection:'row', alignItems:'center', justifyContent:'center', borderRadius:8, marginTop:80, backgroundColor:'black'}} onPress={()=>{this.changePassword();}}>
+                    <TouchableOpacity style={{width:Dimensions.get('window').width-36, height:56, flexDirection:'row', alignItems:'center', justifyContent:'center', borderRadius:8, marginTop:80, backgroundColor:this.state.screenmode==='dark'?'#1E9E40':'black'}} onPress={()=>{this.changePassword();}}>
                         <Text style={{color:'white', fontFamily:'Chakra Petch Regular', fontSize:16}}>Change Password</Text>
                     </TouchableOpacity>
                 </View>

@@ -9,27 +9,26 @@ import * as WebBrowser from "expo-web-browser";
 import * as Google from "expo-auth-session/providers/google";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-//import { NavigationContainer } from '@react-navigation/native';
-//import { createNativeStackNavigator } from '@react-navigation/native-stack';
-
 
 WebBrowser.maybeCompleteAuthSession();
 
 class Index extends Component{
     state = {
-        userInfo: null
+        userInfo: {},
+        screenmode: ''
     }
 
     async componentDidMount(){
+        let screenmode = await AsyncStorage.getItem('screenmode');
         //await AsyncStorage.multiRemove(['userdata', 'user']);
         let userinfo = await AsyncStorage.getItem('userdata');
         console.log('index'+userinfo);
-        this.setState({userInfo: userinfo});
+        this.setState({userInfo: userinfo, screenmode:screenmode});
     }
 
     render(){
         return(
-            <View style={styles.container}>
+            <View style={{...styles.container, backgroundColor:this.state.screenmode==='dark'?'#181818':'white'}}>
                 <ImageBackground style={styles.bg} source={require('./../assets/loadingbg.jpg')} resizeMode="cover">
                     <TouchableOpacity 
                         style={styles.logolink} 
@@ -47,7 +46,6 @@ class Index extends Component{
 const styles = StyleSheet.create({
     container: {
         flex: 1, flexDirection: 'column', justifyContent: 'space-around', alignItems: 'center',
-        backgroundColor: 'white'
     },
 
     bg: { 

@@ -12,9 +12,9 @@ class Header extends Component{
             <View style={{...styles.viewTop}}>
                 <TouchableOpacity style={{...styles.viewTL}} onPress={()=>{ navigation.navigate('/user/home/profile'); }}>
                     <Image style={{width:40, height:40, borderRadius:'50%', marginRight:10}} source={{uri:'https://lh3.googleusercontent.com/a/AAcHTtd0T2Z9BXfB350McjCdHFVkoySPGdcJ7GG4JmgNS_28Q7I=s96-c'}}></Image>
-                    <Text style={{fontFamily:'Chakra Petch SemiBold', fontSize:18}}>{this.props.username}</Text>
+                    <Text style={{fontFamily:'Chakra Petch SemiBold', fontSize:18, color:this.props.screenmode==='dark'?'white':'black'}}>{this.props.username}</Text>
                 </TouchableOpacity>
-                <View style={{flexDirection:'row', alignItems:'flex-start', justifyContent:'flex-end'}}>
+                <View style={{flexDirection:'row', alignItems:'flex-start', justifyContent:'flex-end', backgroundColor:this.props.screenmode==='dark'?'#828384':'rgba(0,0,0,0)', padding:5, borderRadius:8}}>
                     <Image source={require('./../assets/notification.png')}></Image>
                     <Image style={{position:'absolute', right:5}} source={require('./../assets/reddot.png')}></Image>
                 </View>

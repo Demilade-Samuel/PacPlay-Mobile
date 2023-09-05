@@ -46,17 +46,19 @@ class Profile extends Component{
         digit6: '',
         vcodeloading: false,
         vcodelabel:'',
-        vcodecolor:''
+        vcodecolor:'',
+        screenmode:''
     }
 
     async componentDidMount(){
         let data = await AsyncStorage.getItem('userdata');
+        let screenmode = await AsyncStorage.getItem('screenmode');
         data = JSON.parse(data);
-        
+        this.setState({screenmode:screenmode});
         if(data){
             //A default call to the server to get user details, incase there are any updates
             const defrequest = fetch(
-                "http://localhost:3000/getuserdata",
+                "http://localhost:3000/getuserdatawithgames",
                 {
                     method: 'POST',
                     body: JSON.stringify({userid: data.userid}),
@@ -280,12 +282,12 @@ class Profile extends Component{
 
     render(){
         return(
-            <View>
+            <View style={{backgroundColor:this.state.screenmode==='dark'?'#181818':'white', height:Dimensions.get('window').height}}>
                 <View style={{display:'flex', flexDirection:'row', alignItems:'center', justifyContent:'flex-start', marginTop:20}}>
                     <TouchableOpacity onPress={()=>{navigation.navigate('/user/home');}}>
-                        <Image style={{marginLeft:10}} source={require('./../../../../assets/gameback.png')}></Image>
+                        <Image style={{marginLeft:10}} source={this.state.screenmode==='dark'?require('./../../../../assets/gameback-dark.png'):require('./../../../../assets/gameback.png')}></Image>
                     </TouchableOpacity>
-                    <Text style={{fontFamily:'Chakra Petch SemiBold', fontSize:24, marginLeft:130}}>Profile</Text>
+                    <Text style={{fontFamily:'Chakra Petch SemiBold', fontSize:24, marginLeft:130, color:this.state.screenmode==='dark'?'white':'black'}}>Profile</Text>
                 </View>
                 <ActivityIndicator style={{display:this.state.loading?'flex':'none', marginTop:Dimensions.get('window').height*0.4}}></ActivityIndicator>
                 <ScrollView ref={this.scrollViewRef} style={{ display:!this.state.loading?'flex':'none', overflowX: 'none'}} 
@@ -295,37 +297,37 @@ class Profile extends Component{
 
                     <View style={{flexDirection:'row', alignItems:'center', justifyContent:'space-around', width:332, height:69, marginTop:10}}>
                         <View style={{flexDirection:'colum', alignItems:'center', justifyContent:'space-between', height:70}}>
-                            <Text style={{fontFamily:'Chakra Petch Regular', fontSize:14}}>Games Created</Text>
-                            <View style={{width:80, height:40, borderRadius:4, backgroundColor:'black', alignItems:'center', justifyContent:'center'}}>
-                                <Text style={{fontFamily:'Chakra Petch Regular', fontSize:18, color:'white', textAlign:'center', }}>{this.state.userdata.gamescreated?this.state.userdata.gamescreated.length:'0'}</Text>
+                            <Text style={{fontFamily:'Chakra Petch Regular', fontSize:14, color:this.state.screenmode==='dark'?'white':'black'}}>Games Created</Text>
+                            <View style={{width:80, height:40, borderRadius:4, backgroundColor:this.state.screenmode==='dark'?'white':'black', alignItems:'center', justifyContent:'center'}}>
+                                <Text style={{fontFamily:'Chakra Petch Regular', fontSize:18, color:this.state.screenmode==='dark'?'black':'white', textAlign:'center', }}>{this.state.userdata.gamescreated?this.state.userdata.gamescreated.length:'0'}</Text>
                             </View>
                         </View>
 
                         <View style={{flexDirection:'colum', alignItems:'center', justifyContent:'space-between', height:70}}>
-                            <Text style={{fontFamily:'Chakra Petch Regular', fontSize:14}}>Bets Won</Text>
-                            <View style={{width:80, height:40, borderRadius:4, backgroundColor:'black', alignItems:'center', justifyContent:'center'}}>
-                                <Text style={{fontFamily:'Chakra Petch Regular', fontSize:18, color:'white', textAlign:'center', }}>{this.state.userdata.gameswon?this.state.userdata.gameswon:'0'}</Text>
+                            <Text style={{fontFamily:'Chakra Petch Regular', fontSize:14, color:this.state.screenmode==='dark'?'white':'black'}}>Bets Won</Text>
+                            <View style={{width:80, height:40, borderRadius:4, backgroundColor:this.state.screenmode==='dark'?'white':'black', alignItems:'center', justifyContent:'center'}}>
+                                <Text style={{fontFamily:'Chakra Petch Regular', fontSize:18, color:this.state.screenmode==='dark'?'black':'white', textAlign:'center', }}>{this.state.userdata.gameswon?this.state.userdata.gameswon:'0'}</Text>
                             </View>
                         </View>
 
                         <View style={{flexDirection:'colum', alignItems:'center', justifyContent:'space-between', height:70}}>
-                            <Text style={{fontFamily:'Chakra Petch Regular', fontSize:14}}>Bets Lost</Text>
-                            <View style={{width:80, height:40, borderRadius:4, backgroundColor:'black', alignItems:'center', justifyContent:'center'}}>
-                                <Text style={{fontFamily:'Chakra Petch Regular', fontSize:18, color:'white', textAlign:'center', }}>{this.state.userdata.gameslost?this.state.userdata.gameslost:'0'}</Text>
+                            <Text style={{fontFamily:'Chakra Petch Regular', fontSize:14, color:this.state.screenmode==='dark'?'white':'black'}}>Bets Lost</Text>
+                            <View style={{width:80, height:40, borderRadius:4, backgroundColor:this.state.screenmode==='dark'?'white':'black', alignItems:'center', justifyContent:'center'}}>
+                                <Text style={{fontFamily:'Chakra Petch Regular', fontSize:18, color:this.state.screenmode==='dark'?'black':'white', textAlign:'center', }}>{this.state.userdata.gameslost?this.state.userdata.gameslost:'0'}</Text>
                             </View>
                         </View>
                     </View>
 
                     <View>
                         <View style={{marginTop:15}}>
-                            <Text style={{fontFamily:'Chakra Petch Regular', fontSize:14}}>Full Name</Text>
-                            <View style={{width:340, borderRadius:8, height:44, flexDirection:'row', alignItems:'center', justifyContent:'space-between', borderWidth:1, borderLeftColor:'#928E8E', borderRightColor:'#928E8E', borderTopColor:'#928E8E', borderBottomColor:'#928E8E', paddingLeft:15, paddingRight:15, marginTop:5}}>
+                            <Text style={{fontFamily:'Chakra Petch Regular', fontSize:14, color:this.state.screenmode==='dark'?'white':'black'}}>Full Name</Text>
+                            <View style={{width:340, borderRadius:8, height:44, flexDirection:'row', alignItems:'center', justifyContent:'space-between', borderWidth:1, borderColor:this.state.screenmode==='dark'?'white':'#928E8E', paddingLeft:15, paddingRight:15, marginTop:5}}>
                                 <TextInput
                                     editable={this.state.fullnameeditable}
                                     placeholder={this.state.userdata.fullname?this.state.userdata.fullname:'Full Name'}
                                     value={this.state.fullname}
                                     onChangeText={ (e)=>{this.setState({fullname: e});} }
-                                    style={{outlineStyle:'none', width:320, borderRadius:8, height:44, fontSize:16, fontFamily:'Chakra Petch Regular',}}
+                                    style={{outlineStyle:'none', width:320, borderRadius:8, height:44, fontSize:16, fontFamily:'Chakra Petch Regular', color:this.state.screenmode==='dark'?'white':'black'}}
                                 />
                                 <TouchableOpacity onPress={()=>{ !this.state.fullnameloader? this.changeEditability('fullname') :''; }}>
                                     <Text style={{display:!this.state.fullnameloader?'flex':'none', color:'#4285F4', fontFamily:'Chakra Petch Regular', fontSize:16}}>{this.state.fullnameeditable?'Save':'Edit'}</Text>
@@ -336,14 +338,14 @@ class Profile extends Component{
                         </View>
 
                         <View style={{marginTop:15}}>
-                            <Text style={{fontFamily:'Chakra Petch Regular', fontSize:14}}>Username</Text>
-                            <View style={{width:340, borderRadius:8, height:44, flexDirection:'row', alignItems:'center', justifyContent:'space-between', borderWidth:1, borderLeftColor:'#928E8E', borderRightColor:'#928E8E', borderTopColor:'#928E8E', borderBottomColor:'#928E8E', paddingLeft:15, paddingRight:15, marginTop:5}}>
+                            <Text style={{fontFamily:'Chakra Petch Regular', fontSize:14, color:this.state.screenmode==='dark'?'white':'black'}}>Username</Text>
+                            <View style={{width:340, borderRadius:8, height:44, flexDirection:'row', alignItems:'center', justifyContent:'space-between', borderWidth:1, borderColor:this.state.screenmode==='dark'?'white':'#928E8E', paddingLeft:15, paddingRight:15, marginTop:5}}>
                                 <TextInput
                                     editable={this.state.usernameeditable}
                                     placeholder={this.state.userdata.username?this.state.userdata.username:'username'}
                                     value={this.state.username}
                                     onChangeText={ (e)=>{this.setState({username: e});} }
-                                    style={{outlineStyle:'none', width:320, borderRadius:8, height:44, fontSize:16, fontFamily:'Chakra Petch Regular',}}
+                                    style={{outlineStyle:'none', width:320, borderRadius:8, height:44, fontSize:16, fontFamily:'Chakra Petch Regular', color:this.state.screenmode==='dark'?'white':'black'}}
                                 />
                                 <TouchableOpacity onPress={()=>{ !this.state.usernameloader? this.changeEditability('username'):''; }}>
                                     <Text style={{display:!this.state.usernameloader?'flex':'none', color:'#4285F4', fontFamily:'Chakra Petch Regular', fontSize:16}}>{this.state.usernameeditable?'Save':'Edit'}</Text>
@@ -354,14 +356,14 @@ class Profile extends Component{
                         </View>
 
                         <View style={{marginTop:15}}>
-                            <Text style={{fontFamily:'Chakra Petch Regular', fontSize:14}}>Email</Text>
-                            <View style={{width:340, borderRadius:8, height:44, flexDirection:'row', alignItems:'center', justifyContent:'space-between', borderWidth:1, borderLeftColor:'#928E8E', borderRightColor:'#928E8E', borderTopColor:'#928E8E', borderBottomColor:'#928E8E', paddingLeft:15, paddingRight:15, marginTop:5}}>
+                            <Text style={{fontFamily:'Chakra Petch Regular', fontSize:14, color:this.state.screenmode==='dark'?'white':'black'}}>Email</Text>
+                            <View style={{width:340, borderRadius:8, height:44, flexDirection:'row', alignItems:'center', justifyContent:'space-between', borderWidth:1, borderColor:this.state.screenmode==='dark'?'white':'#928E8E', paddingLeft:15, paddingRight:15, marginTop:5}}>
                                 <TextInput
                                     editable={this.state.emaileditable}
                                     placeholder={this.state.userdata.email?this.state.userdata.email:'email@gmail.com'}
                                     value={this.state.email}
                                     onChangeText={ (e)=>{this.setState({email: e});} }
-                                    style={{outlineStyle:'none', width:320, borderRadius:8, height:44, fontSize:16, fontFamily:'Chakra Petch Regular',}}
+                                    style={{outlineStyle:'none', width:320, borderRadius:8, height:44, fontSize:16, fontFamily:'Chakra Petch Regular', color:this.state.screenmode==='dark'?'white':'black'}}
                                 />
                                 <TouchableOpacity onPress={()=>{ this.changeEditability('email'); }}>
                                     <Text style={{display:!this.state.emailloader?'flex':'none', color:'#4285F4', fontFamily:'Chakra Petch Regular', fontSize:16}}>{this.state.emaileditable?'Verify':'Edit'}</Text>
@@ -372,15 +374,15 @@ class Profile extends Component{
                         </View>
 
                         <View style={{marginTop:15}}>
-                            <Text style={{fontFamily:'Chakra Petch Regular', fontSize:14}}>Phone Number</Text>
-                            <View style={{width:340, borderRadius:8, height:44, flexDirection:'row', alignItems:'center', justifyContent:'space-between', borderWidth:1, borderLeftColor:'#928E8E', borderRightColor:'#928E8E', borderTopColor:'#928E8E', borderBottomColor:'#928E8E', paddingLeft:15, paddingRight:15, marginTop:5}}>
+                            <Text style={{fontFamily:'Chakra Petch Regular', fontSize:14, color:this.state.screenmode==='dark'?'white':'black'}}>Phone Number</Text>
+                            <View style={{width:340, borderRadius:8, height:44, flexDirection:'row', alignItems:'center', justifyContent:'space-between', borderWidth:1, borderColor:this.state.screenmode==='dark'?'white':'#928E8E', paddingLeft:15, paddingRight:15, marginTop:5}}>
                                 <TextInput
                                     editable={this.state.phoneeditable}
                                     placeholder={this.state.userdata.phone?this.state.userdata.phone:'08123456789'}
                                     value={this.state.phone}
                                     onChangeText={ (e)=>{this.setState({phone: e});} }
                                     keyboardType={'numeric'}
-                                    style={{outlineStyle:'none', width:320, borderRadius:8, height:44, fontSize:16, fontFamily:'Chakra Petch Regular',}}
+                                    style={{outlineStyle:'none', width:320, borderRadius:8, height:44, fontSize:16, fontFamily:'Chakra Petch Regular', color:this.state.screenmode==='dark'?'white':'black'}}
                                 />
                                 <TouchableOpacity onPress={()=>{ this.changeEditability('phone'); }}>
                                     <Text style={{color:'#4285F4', fontFamily:'Chakra Petch Regular', fontSize:16}}>{this.state.phoneeditable?'Save':'Edit'}</Text>
@@ -394,9 +396,9 @@ class Profile extends Component{
                 </View>
 
                 <View style={{width:Dimensions.get('window').width, flexDirection:'column', alignItems:'center', justifyContent:'flex-start', marginTop:40}}>
-                    <Text style={{fontFamily:'Chakra Petch SemiBold', fontSize:20, width:Dimensions.get('window').width, textAlign:'center'}}>Confirm Email</Text>
-                    <Text style={{fontFamily:'Chakra Petch Regular', fontSize:16, width:356, textAlign:'center', color:'', marginTop:10}}>{'Input the 6 digit code that was sent to '+this.state.email+'. If it is not in your inbox check your spam.'}</Text>
-                    <Text style={{fontFamily:'Chakra Petch Regular', fontSize:16, width:356, textAlign:'center', color:''}}>The code will be invalid in 3 mins</Text>
+                    <Text style={{fontFamily:'Chakra Petch SemiBold', fontSize:20, width:Dimensions.get('window').width, textAlign:'center', color:this.state.screenmode==='dark'?'white':'black'}}>Confirm Email</Text>
+                    <Text style={{fontFamily:'Chakra Petch Regular', fontSize:16, width:356, textAlign:'center', color:'', marginTop:10, color:this.state.screenmode==='dark'?'white':'black'}}>{'Input the 6 digit code that was sent to '+this.state.email+'. If it is not in your inbox check your spam.'}</Text>
+                    <Text style={{fontFamily:'Chakra Petch Regular', fontSize:16, width:356, textAlign:'center', color:'', color:this.state.screenmode==='dark'?'white':'black'}}>The code will be invalid in 3 mins</Text>
                     <View style={{flexDirection:'row', justifyContent:'space-around', alignItems:'center', width:382}}>
                         <TextInput
                             ref={this.input1}
@@ -404,7 +406,7 @@ class Profile extends Component{
                             value={this.state.digit1}
                             keyboardType={'numeric'}
                             onChangeText={ (e)=>{ if(e===''){ this.setState({digit1:e}); }else{ if(this.state.digit1!==''){ this.setState({digit1: e[1]}); }else{ this.setState({digit1: e[0]});  } this.input2.current.focus(); } } }
-                            style={{outlineStyle:'none', width:60, height:50, fontSize:30, fontFamily:'Chakra Petch SemiBold', textAlign:'center', borderWidth:2, borderBottomColor:'black', borderTopColor:'rgba(0,0,0,0)', borderLeftColor:'rgba(0,0,0,0)', borderRightColor:'rgba(0,0,0,0)'}}
+                            style={{outlineStyle:'none', width:60, height:50, fontSize:30, fontFamily:'Chakra Petch SemiBold', textAlign:'center', borderWidth:2, borderBottomColor:this.state.screenmode==='dark'?'white':'black', borderTopColor:'rgba(0,0,0,0)', borderLeftColor:'rgba(0,0,0,0)', borderRightColor:'rgba(0,0,0,0)', color:this.state.screenmode==='dark'?'white':'black'}}
                         />
 
                         <TextInput
@@ -413,7 +415,7 @@ class Profile extends Component{
                             value={this.state.digit2}
                             keyboardType={'numeric'}
                             onChangeText={ (e)=>{ if(e===''){ this.setState({digit2:e}); }else{ if(this.state.digit2!==''){ this.setState({digit2: e[1]}); }else{ this.setState({digit2: e[0]});  } this.input3.current.focus(); } } }
-                            style={{outlineStyle:'none', width:60, height:50, fontSize:30, fontFamily:'Chakra Petch SemiBold', textAlign:'center', borderWidth:2, borderBottomColor:'black', borderTopColor:'rgba(0,0,0,0)', borderLeftColor:'rgba(0,0,0,0)', borderRightColor:'rgba(0,0,0,0)'}}
+                            style={{outlineStyle:'none', width:60, height:50, fontSize:30, fontFamily:'Chakra Petch SemiBold', textAlign:'center', borderWidth:2, borderBottomColor:this.state.screenmode==='dark'?'white':'black', borderTopColor:'rgba(0,0,0,0)', borderLeftColor:'rgba(0,0,0,0)', borderRightColor:'rgba(0,0,0,0)', color:this.state.screenmode==='dark'?'white':'black'}}
                         />
 
                         <TextInput
@@ -422,7 +424,7 @@ class Profile extends Component{
                             value={this.state.digit3}
                             keyboardType={'numeric'}
                             onChangeText={ (e)=>{ if(e===''){ this.setState({digit3:e}); }else{ if(this.state.digit3!==''){ this.setState({digit3: e[1]}); }else{ this.setState({digit3: e[0]});  } this.input4.current.focus(); } } }
-                            style={{outlineStyle:'none', width:60, height:50, fontSize:30, fontFamily:'Chakra Petch SemiBold', textAlign:'center', borderWidth:2, borderBottomColor:'black', borderTopColor:'rgba(0,0,0,0)', borderLeftColor:'rgba(0,0,0,0)', borderRightColor:'rgba(0,0,0,0)'}}
+                            style={{outlineStyle:'none', width:60, height:50, fontSize:30, fontFamily:'Chakra Petch SemiBold', textAlign:'center', borderWidth:2, borderBottomColor:this.state.screenmode==='dark'?'white':'black', borderTopColor:'rgba(0,0,0,0)', borderLeftColor:'rgba(0,0,0,0)', borderRightColor:'rgba(0,0,0,0)', color:this.state.screenmode==='dark'?'white':'black'}}
                         />
 
                         <TextInput
@@ -431,7 +433,7 @@ class Profile extends Component{
                             value={this.state.digit4}
                             keyboardType={'numeric'}
                             onChangeText={ (e)=>{ if(e===''){ this.setState({digit4:e}); }else{ if(this.state.digit4!==''){ this.setState({digit4: e[1]}); }else{ this.setState({digit4: e[0]});  } this.input5.current.focus(); } } }
-                            style={{outlineStyle:'none', width:60, height:50, fontSize:30, fontFamily:'Chakra Petch SemiBold', textAlign:'center', borderWidth:2, borderBottomColor:'black', borderTopColor:'rgba(0,0,0,0)', borderLeftColor:'rgba(0,0,0,0)', borderRightColor:'rgba(0,0,0,0)'}}
+                            style={{outlineStyle:'none', width:60, height:50, fontSize:30, fontFamily:'Chakra Petch SemiBold', textAlign:'center', borderWidth:2, borderBottomColor:this.state.screenmode==='dark'?'white':'black', borderTopColor:'rgba(0,0,0,0)', borderLeftColor:'rgba(0,0,0,0)', borderRightColor:'rgba(0,0,0,0)', color:this.state.screenmode==='dark'?'white':'black'}}
                         />
 
                         <TextInput
@@ -440,7 +442,7 @@ class Profile extends Component{
                             value={this.state.digit5}
                             keyboardType={'numeric'}
                             onChangeText={ (e)=>{ if(e===''){ this.setState({digit5:e}); }else{ if(this.state.digit5!==''){ this.setState({digit5: e[1]}); }else{ this.setState({digit5: e[0]});  } this.input6.current.focus(); } } }
-                            style={{outlineStyle:'none', width:60, height:50, fontSize:30, fontFamily:'Chakra Petch SemiBold', textAlign:'center', borderWidth:2, borderBottomColor:'black', borderTopColor:'rgba(0,0,0,0)', borderLeftColor:'rgba(0,0,0,0)', borderRightColor:'rgba(0,0,0,0)'}}
+                            style={{outlineStyle:'none', width:60, height:50, fontSize:30, fontFamily:'Chakra Petch SemiBold', textAlign:'center', borderWidth:2, borderBottomColor:this.state.screenmode==='dark'?'white':'black', borderTopColor:'rgba(0,0,0,0)', borderLeftColor:'rgba(0,0,0,0)', borderRightColor:'rgba(0,0,0,0)', color:this.state.screenmode==='dark'?'white':'black'}}
                         />
 
                         <TextInput
@@ -449,24 +451,24 @@ class Profile extends Component{
                             value={this.state.digit6}
                             keyboardType={'numeric'}
                             onChangeText={ (e)=>{ if(e===''){ this.setState({digit6:e}); }else{ if(this.state.digit6!==''){this.setState({digit6: e[1]});}else{this.setState({digit6: e[0]});} } } }
-                            style={{outlineStyle:'none', width:60, height:50, fontSize:30, fontFamily:'Chakra Petch SemiBold', textAlign:'center', borderWidth:2, borderBottomColor:'black', borderTopColor:'rgba(0,0,0,0)', borderLeftColor:'rgba(0,0,0,0)', borderRightColor:'rgba(0,0,0,0)'}}
+                            style={{outlineStyle:'none', width:60, height:50, fontSize:30, fontFamily:'Chakra Petch SemiBold', textAlign:'center', borderWidth:2, borderBottomColor:this.state.screenmode==='dark'?'white':'black', borderTopColor:'rgba(0,0,0,0)', borderLeftColor:'rgba(0,0,0,0)', borderRightColor:'rgba(0,0,0,0)', color:this.state.screenmode==='dark'?'white':'black'}}
                         />
                     </View>
 
                     <Text style={{marginTop:10, width:382, textAlign:'center', fontFamily:'Chakra Petch Regular', fontSize:16, color:this.state.vcodecolor}}>{this.state.vcodelabel}</Text>
 
                     <View style={{flexDirection:'column', alignItems:'center', justifyContent:'flex-start', marginTop:120}}>
-                        <TouchableOpacity style={{width:Dimensions.get('window').width-36, height:56, flexDirection:'row', alignItems:'center', justifyContent:'center', borderRadius:8, marginTop:20, backgroundColor:'black'}} onPress={()=>{!this.state.vcodeloading?this.verifycode():'';}}>
+                        <TouchableOpacity style={{width:Dimensions.get('window').width-36, height:56, flexDirection:'row', alignItems:'center', justifyContent:'center', borderRadius:8, marginTop:20, backgroundColor:this.state.screenmode==='dark'?'#1E9E40':'black'}} onPress={()=>{!this.state.vcodeloading?this.verifycode():'';}}>
                             <Text style={{display:!this.state.vcodeloading?'flex':'none', color:'white', fontFamily:'Chakra Petch Regular', fontSize:16}}>Verify code</Text>
                             <ActivityIndicator style={{display:this.state.vcodeloading?'flex':'none'}} color="white"></ActivityIndicator>
                         </TouchableOpacity>
 
-                        <TouchableOpacity style={{width:Dimensions.get('window').width-36, height:56, flexDirection:'row', alignItems:'center', justifyContent:'center', borderRadius:8, marginTop:20, backgroundColor:'black'}} onPress={()=>{!this.state.emailloader?this.resendcode():'';}}>
+                        <TouchableOpacity style={{width:Dimensions.get('window').width-36, height:56, flexDirection:'row', alignItems:'center', justifyContent:'center', borderRadius:8, marginTop:20, backgroundColor:this.state.screenmode==='dark'?'#1E9E40':'black'}} onPress={()=>{!this.state.emailloader?this.resendcode():'';}}>
                             <Text style={{display:!this.state.emailloader?'flex':'none', color:'white', fontFamily:'Chakra Petch Regular', fontSize:16}}>Resend code</Text>
                             <ActivityIndicator style={{display:this.state.emailloader?'flex':'none'}} color="white"></ActivityIndicator>
                         </TouchableOpacity>
 
-                        <TouchableOpacity style={{width:Dimensions.get('window').width-36, height:56, flexDirection:'row', alignItems:'center', justifyContent:'center', borderRadius:8, marginTop:20, backgroundColor:'black'}} onPress={()=>{this.goback();}}>
+                        <TouchableOpacity style={{width:Dimensions.get('window').width-36, height:56, flexDirection:'row', alignItems:'center', justifyContent:'center', borderRadius:8, marginTop:20, backgroundColor:this.state.screenmode==='dark'?'#1E9E40':'black'}} onPress={()=>{this.goback();}}>
                             <Text style={{color:'white', fontFamily:'Chakra Petch Regular', fontSize:16}}>Go Back</Text>
                         </TouchableOpacity>
                     </View>

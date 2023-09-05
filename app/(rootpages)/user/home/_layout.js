@@ -5,6 +5,7 @@ const Layout = () => {
     <Stack screenOptions={{headerShown: false}}>
         <Stack.Screen name="creategame"/>
         <Stack.Screen name="joingame"/>
+        <Stack.Screen name="waitingroom"/>
     </Stack>
     )
 }

@@ -6,6 +6,7 @@ const Layout = () => {
         <Stack.Screen name="deposit"/>
         <Stack.Screen name="withdraw"/>
         <Stack.Screen name="billpayment"/>
+        <Stack.Screen name="transactions"/>
     </Stack>
     )
 }
