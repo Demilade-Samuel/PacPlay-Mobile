@@ -3,32 +3,39 @@
 //android 63977248527-dhjam7h58jk4ltfmd2mm25kkbo0mtceo.apps.googleusercontent.com
 
 import React, { Component } from 'react';
-import { View, Text, ImageBackground, Image, StyleSheet} from 'react-native';
-import { Link } from 'expo-router';
+import { View, Text, ImageBackground, Image, StyleSheet, TouchableOpacity} from 'react-native';
+import { Link, router, Stack } from 'expo-router';
 import * as WebBrowser from "expo-web-browser";
 import * as Google from "expo-auth-session/providers/google";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 WebBrowser.maybeCompleteAuthSession();
 
 class Index extends Component{
     state = {
-        userInfo: null
+        userInfo: {},
+        screenmode: ''
     }
 
     async componentDidMount(){
-        let userinfo = await AsyncStorage.getItem('user');
-        console.log(userinfo);
-        this.setState({userInfo: userinfo});
+        let screenmode = await AsyncStorage.getItem('screenmode');
+        //await AsyncStorage.multiRemove(['userdata', 'user']);
+        let userinfo = await AsyncStorage.getItem('userdata');
+        console.log('index'+userinfo);
+        this.setState({userInfo: userinfo, screenmode:screenmode});
     }
 
     render(){
         return(
-            <View style={styles.container}>
+            <View style={{...styles.container, backgroundColor:this.state.screenmode==='dark'?'#181818':'white'}}>
                 <ImageBackground style={styles.bg} source={require('./../assets/loadingbg.jpg')} resizeMode="cover">
-                    <Link style={styles.logolink} href={this.state.userInfo?'/user':'/signin'}>
+                    <TouchableOpacity 
+                        style={styles.logolink} 
+                        onPress={()=>{ this.state.userInfo ? navigation.navigate('/user/home') : navigation.navigate('first'); }}
+                    >
                         <Image style={styles.logo} source={require('./../assets/logo.png')}></Image>
-                    </Link>
+                    </TouchableOpacity>
                     <Image style={styles.iam} source={require('./../assets/itsamatch.png')}></Image>
                 </ImageBackground>
             </View>
@@ -39,7 +46,6 @@ class Index extends Component{
 const styles = StyleSheet.create({
     container: {
         flex: 1, flexDirection: 'column', justifyContent: 'space-around', alignItems: 'center',
-        backgroundColor: 'white'
     },
 
     bg: { 

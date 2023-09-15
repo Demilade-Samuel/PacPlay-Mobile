@@ -1,16 +1,19 @@
 {
   "expo": {
     "scheme": "acme",
+    "userInterfaceStyle": "automatic",
     "web": {
       "bundler": "metro"
     },
     "name": "PacPlay",
     "slug": "PacPlay",
     "android": {
-      "package": "com.anonymous.PacPlay"
+      "package": "com.anonymous.PacPlay",
+      "userInterfaceStyle": "automatic"
     },
     "ios": {
-      "bundleIdentifier": "com.anonymous.PacPlay"
+      "bundleIdentifier": "com.anonymous.PacPlay",
+      "userInterfaceStyle": "automatic"
     }
   }
 }
