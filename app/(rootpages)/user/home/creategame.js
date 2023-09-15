@@ -52,9 +52,33 @@ class CreateGame extends Component{
         }
     }
 
+    faultFree = () => {
+        if(this.state.gametitle && this.state.gamedesc && this.state.bettype && this.state.stake && parseInt(this.state.stake)<=parseInt(this.state.userdata.wallet) ){
+            return true;
+        }else{
+            if(this.state.gametitle===''){
+                this.setState({gametitlewarning: 'This field cannot be empty'});
+            }
+
+            if(this.state.gamedesc===''){
+                this.setState({gamedescwarning: 'This field cannot be empty'});
+            }
+
+            if(this.state.stake===''){
+                this.setState({stakewarning: 'This field cannot be empty'});
+            }else{
+                if( !(parseInt(this.state.stake)<=parseInt(this.state.userdata.wallet)) ){
+                    this.setState({stakewarning: 'Insufficient funds in wallet for this stake'})
+                }
+            }
+
+            return false;
+        }
+    }
+
     h2h = () => {
         this.setState({gametitlewarning:'', gamedescwarning:'', stakewarning:'', h2hwarning:''});
-        if(this.state.gametitle && this.state.gamedesc && this.state.bettype && this.state.stake && parseInt(this.state.stake)<=parseInt(this.state.userdata.wallet) ){
+        if( this.faultFree() ){
             this.setState({reqloading:true});
             let payload = {
                 creatorid: this.state.userdata.userid,
@@ -81,25 +105,46 @@ class CreateGame extends Component{
                     this.setState({reqloading:false});
                     navigation.navigate('/user/home/waitingroom');
                 }else{
-                    this.setState({h2hwarning: 'An error occurred, please try again later.'});
+                    this.setState({h2hwarning: 'An error occurred, please try again later.', reqloading:false});
                 }
             });
-        }else{
-            if(this.state.gametitle===''){
-                this.setState({gametitlewarning: 'This field cannot be empty'});
+        }
+    }
+
+    admin = () => {
+        this.setState({gametitlewarning:'', gamedescwarning:'', stakewarning:'', h2hwarning:''});
+        if(this.faultFree()){
+            this.setState({reqloading:true});
+            let payload = {
+                creatorid: this.state.userdata.userid,
+                creator: this.state.userdata.username,
+                gametitle: this.state.gametitle,
+                gamedesc: this.state.gamedesc,
+                bettype: this.state.bettype,
+                stake: this.state.stake,
+                pvtnames: [this.state.name1, this.state.name2],
+                availablewagers: this.state.includeDraw ? [ this.state.name1!=='' ? (this.state.name1+' wins') : this.state.gametype==='PVP'?'Player1 wins':'Team1 wins', this.state.name2!==''?this.state.name2+' wins': this.state.gametype==='PVP'?'Player2 wins':'Team2 wins', 'Ends a draw'] : [ this.state.name1!=='' ? (this.state.name1+' wins') : this.state.gametype==='PVP'?'Player1 wins':'Team1 wins', this.state.name2!==''?this.state.name2+' wins': this.state.gametype==='PVP'?'Player2 wins':'Team2 wins' ]
             }
 
-            if(this.state.gamedesc===''){
-                this.setState({gamedescwarning: 'This field cannot be empty'});
-            }
-
-            if(this.state.stake===''){
-                this.setState({stakewarning: 'This field cannot be empty'});
-            }
-
-            if( !(parseInt(this.state.stake)<=parseInt(this.state.userdata.wallet)) ){
-                this.setState({stakewarning: 'Insufficient funds in wallet for this stake'})
-            }
+            fetch(
+                "http://localhost:3000/creategame2",
+                {
+                    method: 'POST',
+                    body: JSON.stringify(payload),
+                    headers: { 'Content-Type': 'application/json' }
+                }
+            ).then(response => {
+                return response.json();
+            }).then(async response => {
+                console.log(response);
+                if(response.msg==='success'){
+                    await AsyncStorage.setItem('gameid', response.gameid);
+                    this.setState({reqloading:false});
+                    navigation.navigate('/user/home/waitingroom2');
+                }else{
+                    this.setState({h2hwarning: 'An error occurred, please try again later.', reqloading:false});
+                }
+            });
         }
     }
 
@@ -108,7 +153,9 @@ class CreateGame extends Component{
             <View style={{flexDirection:'column', alignItems:'flex-start', justifyContent:'flex-start', backgroundColor:this.state.screenmode==='dark'?'#181818':'white'}}>
                 <ActivityIndicator style={{display:this.state.loading?'flex':'none', position:'absolute', top: Dimensions.get('window').height*0.45,  left: Dimensions.get('window').width*0.48}}></ActivityIndicator>
                 <View style={{display:!this.state.loading?'flex':'none', flexDirection:'row', alignItems:'center', justifyContent:'flex-start', marginTop:20}}>
+                    <TouchableOpacity onPress={()=>{navigation.navigate('/user/home')}}>
                     <Image style={{marginLeft:10}} source={this.state.screenmode==='dark'?require('./../../../../assets/gameback-dark.png'):require('./../../../../assets/gameback.png')}></Image>
+                    </TouchableOpacity>
                     <Text style={{fontFamily:'Chakra Petch SemiBold', fontSize:24, marginLeft:108, color:this.state.screenmode==='dark'?'white':'black'}}>Create Game</Text>
                 </View>
                 
@@ -175,33 +222,12 @@ class CreateGame extends Component{
                     </View>
                     
                     <Text style={{color:'red', fontFamily:'Chakra Petch Regular', fontSize:14, marginTop:5}}>{this.state.h2hwarning}</Text>
-                    <TouchableOpacity style={{display:this.state.bettype==='h2h'?'flex':'none', flexDirection:'row', alignItems:'center', justifyContent:'center', backgroundColor:this.state.screenmode==='dark'?'#1E9E40':'#928E8E', width:362, height:56, borderRadius:6, marginTop:60, marginBottom:10}} onPress={()=>{!this.state.reqloading ? this.h2h() : '';}}>
+                    <TouchableOpacity style={{display:this.state.bettype==='h2h'?'flex':'none', flexDirection:'row', alignItems:'center', justifyContent:'center', backgroundColor:this.state.screenmode==='dark'?'#1E9E40':'#928E8E', width:362, height:56, borderRadius:6, marginTop:50, marginBottom:10}} onPress={()=>{!this.state.reqloading ? this.h2h() : '';}}>
                         <ActivityIndicator style={{display:this.state.reqloading?'flex':'none'}} color='white'></ActivityIndicator>
                         <Text style={{display:!this.state.reqloading?'flex':'none', color:'white', fontFamily:'Chakra Petch Regular', fontSize:15}}>Proceed</Text>
                     </TouchableOpacity>
                     
                     <View style={{display:this.state.bettype==='admin'?'flex':'none'}}>
-                        <View style={{width:372, flexDirection:'row', alignItems:'center', justifyContent:'space-between', paddingTop:20, paddingBottom:20, marginTop:20, borderWidth:1, borderBottomColor:'#C8D1DB', borderTopColor:'#C8D1DB', borderRightColor:'rgba(0,0,0,0)', borderLeftColor:'rgba(0,0,0,0)'}}>
-                            <Text style={{fontFamily:'Chakra Petch Regular', fontSize:20, marginLeft:10, color:this.state.screenmode==='dark'?'white':'black'}}>Wager Style</Text>
-                            <View style={{flexDirection:'row', alignItems:'center', justifyContent:'space-between', }}>
-                                <Text style={{fontSize:16, fontFamily:'Chakra Petch Regular', color:this.state.wagerstructure==='default'? this.state.screenmode==='dark'?'#1E9E40':'#4285F4' : '#C8D1DB', marginRight:12}}>Default</Text>
-                                <Switch
-                                    value={this.state.wagerstructure==='default'?false:true}
-                                    onValueChange={(e)=>{ e ? this.setState({wagerstructure:'custom'}) : this.setState({wagerstructure:'default'}); }}
-                                    inActiveText=''
-                                    activeText=''
-                                    backgroundActive={this.state.screenmode==='dark'?'#1E9E40':'#4285F4'}
-                                    backgroundInactive={this.state.screenmode==='dark'?'#1E9E40':'#4285F4'}
-                                    circleActiveColor={this.state.screenmode==='dark'?'#343434':'#928E8E'}
-                                    circleInActiveColor={this.state.screenmode==='dark'?'#343434':'#928E8E'}
-                                    circleBorderActiveColor={this.state.screenmode==='dark'?'#1E9E40':'#4285F4'}
-                                    circleBorderInactiveColor={this.state.screenmode==='dark'?'#1E9E40':'#4285F4'}
-                                    circleBorderWidth={4}
-                                />
-                                <Text style={{fontSize:16, fontFamily:'Chakra Petch Regular',  color:this.state.wagerstructure==='custom'? this.state.screenmode==='dark'?'#1E9E40':'#4285F4' : '#C8D1DB', marginLeft:12}}>Custom</Text>
-                            </View>
-                        </View>
-
                         <View style={{display:this.state.wagerstructure==='default'?'flex':'none'}}>
                             <View style={{width:Dimensions.get('window').width*0.9, marginTop:25, flexDirection:'row', justifyContent:'space-between', alignItems:'center'}}>
                                 <TouchableOpacity style={{borderRadius:6, backgroundColor:this.state.screenmode==='dark'? this.state.gametype==='PVP'?'#1E9E40':'rgba(200, 200, 200, 0.7)' : this.state.gametype==='PVP'?'black':'rgba(200, 200, 200, 0.7)', width:140, height:45, flexDirection:'row', alignItems:'center', justifyContent:'center'}} onPress={()=>{this.setState({gametype: 'PVP'});}}>
@@ -237,15 +263,15 @@ class CreateGame extends Component{
                             <View style={{marginTop:25, width:Dimensions.get('window').width*0.9, flexDirection:'column', justifyContent:'flex-start', alignItems:'center'}}>
                                 <Text style={{fontFamily:'Chakra Petch Regular', fontSize:20, width:Dimensions.get('window').width*0.9, color:this.state.screenmode==='dark'?'white':'black'}}>Available Wagers</Text>
 
-                                <View style={{marginTop:15, width:Dimensions.get('window').width*0.95, flexDirection:'row', alignItems:'center', justifyContent:'space-around'}}>
-                                    <TouchableOpacity style={{backgroundColor:'rgba(15,25,166,0.3)', borderRadius:6, padding:10}}>
-                                        <Text style={{fontFamily:'Chakra Petch Regular', fontSize:16, color:this.state.screenmode==='dark'?'rgb(60,100,255)':'#0F19A6'}}>{this.state.gametype==='PVP'?'Player1 wins':'Team1 wins'}</Text>
+                                <View style={{marginTop:15, width:Dimensions.get('window').width*0.95, flexDirection:'row', alignItems:'center', justifyContent:'space-around', flexWrap:'wrap'}}>
+                                    <TouchableOpacity style={{backgroundColor:'rgba(15,25,166,0.3)', borderRadius:6, padding:10, marginTop:10}}>
+                                        <Text style={{fontFamily:'Chakra Petch Regular', fontSize:16, color:this.state.screenmode==='dark'?'rgb(60,100,255)':'#0F19A6'}}>{this.state.name1!==''? (this.state.name1+' wins') : this.state.gametype==='PVP'?'Player1 wins':'Team1 wins'}</Text>
                                     </TouchableOpacity>
-                                    <TouchableOpacity style={{display:this.state.includeDraw?'flex':'none', backgroundColor:'rgba(146,142,142,0.3)', borderRadius:6, padding:10}}>
+                                    <TouchableOpacity style={{display:this.state.includeDraw?'flex':'none', backgroundColor:'rgba(146,142,142,0.3)', borderRadius:6, padding:10, marginTop:10}}>
                                         <Text style={{fontFamily:'Chakra Petch Regular', fontSize:16, color:'#928E8E'}}>Ends a draw</Text>
                                     </TouchableOpacity>
-                                    <TouchableOpacity style={{backgroundColor:'rgba(244,25,25,0.3)', borderRadius:6, padding:10}}>
-                                        <Text style={{fontFamily:'Chakra Petch Regular', fontSize:16, color:this.state.screenmode==='dark'?'rgb(255,80,80)':'#F41919'}}>{this.state.gametype==='PVP'?'Player2 wins':'Team2 wins'}</Text>
+                                    <TouchableOpacity style={{backgroundColor:'rgba(244,25,25,0.3)', borderRadius:6, padding:10, marginTop:10}}>
+                                        <Text style={{fontFamily:'Chakra Petch Regular', fontSize:16, color:this.state.screenmode==='dark'?'rgb(255,80,80)':'#F41919'}}>{this.state.name2!==''? (this.state.name2+' wins') : this.state.gametype==='PVP'?'Player2 wins':'Team2 wins'}</Text>
                                     </TouchableOpacity>
                                 </View> 
 
@@ -260,8 +286,9 @@ class CreateGame extends Component{
                         </View>
 
 
-                        <TouchableOpacity style={{flexDirection:'row', alignItems:'center', justifyContent:'center', backgroundColor:this.state.screenmode==='dark'?'#1E9E40':'#928E8E', width:362, height:56, borderRadius:6, marginTop:25, marginBottom:80}}>
-                            <Text style={{color:'white', fontFamily:'Chakra Petch Regular', fontSize:15}}>Proceed</Text>
+                        <TouchableOpacity style={{flexDirection:'row', alignItems:'center', justifyContent:'center', backgroundColor:this.state.screenmode==='dark'?'#1E9E40':'#928E8E', width:362, height:56, borderRadius:6, marginTop:25, marginBottom:80}}onPress={()=>{!this.state.reqloading ? this.admin() : '';}}>
+                            <ActivityIndicator style={{display:this.state.reqloading?'flex':'none'}} color='white'></ActivityIndicator>
+                            <Text style={{display:!this.state.reqloading?'flex':'none', color:'white', fontFamily:'Chakra Petch Regular', fontSize:15}}>Proceed</Text>
                         </TouchableOpacity>
                     </View>
                 </ScrollView>
@@ -332,4 +359,30 @@ export default CreateGame;
                             <Text style={{color:'white', fontFamily:'Chakra Petch Regular', fontSize:15}}>Confirm</Text>
                         </TouchableOpacity>
                     </View>
+*/
+
+
+//Wager Style
+/*
+    <View style={{width:372, flexDirection:'row', alignItems:'center', justifyContent:'space-between', paddingTop:20, paddingBottom:20, marginTop:20, borderWidth:1, borderBottomColor:'#C8D1DB', borderTopColor:'#C8D1DB', borderRightColor:'rgba(0,0,0,0)', borderLeftColor:'rgba(0,0,0,0)'}}>
+                            <Text style={{fontFamily:'Chakra Petch Regular', fontSize:20, marginLeft:10, color:this.state.screenmode==='dark'?'white':'black'}}>Wager Style</Text>
+                            <View style={{flexDirection:'row', alignItems:'center', justifyContent:'space-between', }}>
+                                <Text style={{fontSize:16, fontFamily:'Chakra Petch Regular', color:this.state.wagerstructure==='default'? this.state.screenmode==='dark'?'#1E9E40':'#4285F4' : '#C8D1DB', marginRight:12}}>Default</Text>
+                                <Switch
+                                    value={this.state.wagerstructure==='default'?false:true}
+                                    onValueChange={(e)=>{ e ? this.setState({wagerstructure:'custom'}) : this.setState({wagerstructure:'default'}); }}
+                                    inActiveText=''
+                                    activeText=''
+                                    backgroundActive={this.state.screenmode==='dark'?'#1E9E40':'#4285F4'}
+                                    backgroundInactive={this.state.screenmode==='dark'?'#1E9E40':'#4285F4'}
+                                    circleActiveColor={this.state.screenmode==='dark'?'#343434':'#928E8E'}
+                                    circleInActiveColor={this.state.screenmode==='dark'?'#343434':'#928E8E'}
+                                    circleBorderActiveColor={this.state.screenmode==='dark'?'#1E9E40':'#4285F4'}
+                                    circleBorderInactiveColor={this.state.screenmode==='dark'?'#1E9E40':'#4285F4'}
+                                    circleBorderWidth={4}
+                                />
+                                <Text style={{fontSize:16, fontFamily:'Chakra Petch Regular',  color:this.state.wagerstructure==='custom'? this.state.screenmode==='dark'?'#1E9E40':'#4285F4' : '#C8D1DB', marginLeft:12}}>Custom</Text>
+                            </View>
+                        </View>
+
 */

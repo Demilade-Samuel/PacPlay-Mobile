@@ -14,7 +14,10 @@ class JoinGame extends Component{
         stakereqloading: false,
         game:{},
         loadgamewarning:'',
-        joingamewarning:''
+        joingamewarning:'',
+        mystake: '',
+        mystakewarning: '',
+        mystakecolor: ''
     }
 
     async componentDidMount(){
@@ -80,6 +83,26 @@ class JoinGame extends Component{
 
                         this.setState({game: response.game, reqloading:false, gameloaded:true});
                     }
+                    
+                    if(response.game.bettype === 'admin'){
+                        if(response.game.creatorid === this.state.userdata.userid){
+                            this.setState({joingamewarning: 'You are the admin in this game'});
+                            await AsyncStorage.setItem('gameid', this.state.gameid);
+                            navigation.navigate('/user/home/waitingroom2');
+                        }
+
+                        if(response.game.wagersidlist.includes(this.state.userdata.userid)){
+                            this.setState({joingamewarning: 'You have already staked in this game'});
+                            await AsyncStorage.setItem('gameid', this.state.gameid);
+                            navigation.navigate('/user/home/waitingroom2');
+                        }
+
+                        if(parseInt(response.game.stake)>parseInt(this.state.userdata.wallet)){
+                            this.setState({joingamewarning: 'Your wallet balance is insufficient to stake in this game'});
+                        }
+
+                        this.setState({game: response.game, reqloading:false, gameloaded:true});
+                    }
                 }else{
                     this.setState({loadgamewarning: response.msg, reqloading:false});
                 }
@@ -90,25 +113,54 @@ class JoinGame extends Component{
     }
 
     stake = () => {
-        this.setState({stakereqloading: true});
+        if(this.state.game.bettype==='h2h'){ //If the game loaded is a head 2 head game
+            this.setState({stakereqloading: true});
 
-        fetch(
-            "http://localhost:3000/stake",
-            {
-                method: 'POST',
-                body: JSON.stringify({gameid: this.state.gameid, userid: this.state.userdata.userid, username: this.state.userdata.username}),
-                headers: { 'Content-Type': 'application/json' }
-            }
-        ).then(response => {
-            return response.json();
-        }).then(async response => {
-            if(response.msg === 'success'){
-                await AsyncStorage.setItem('gameid', this.state.gameid);
-                navigation.navigate('/user/home/waitingroom');
+            fetch(
+                "http://localhost:3000/stake",
+                {
+                    method: 'POST',
+                    body: JSON.stringify({gameid: this.state.gameid, userid: this.state.userdata.userid, username: this.state.userdata.username, mystake:this.state.mystake}),
+                    headers: { 'Content-Type': 'application/json' }
+                }
+            ).then(response => {
+                return response.json();
+            }).then(async response => {
+                if(response.msg === 'success'){
+                    await AsyncStorage.setItem('gameid', this.state.gameid);
+                    navigation.navigate('/user/home/waitingroom');
+                }else{
+                    this.setState({stakereqloading: false, joingamewarning:response.msg});                
+                }
+            });
+        }else{ //If the game loaded is an admin type game
+            
+            this.setState({mystakewarning: ''});
+            if(this.state.mystake!==''){
+                this.setState({stakereqloading: true});
+    
+                fetch(
+                    "http://localhost:3000/stake",
+                    {
+                        method: 'POST',
+                        body: JSON.stringify({gameid: this.state.gameid, userid: this.state.userdata.userid, username: this.state.userdata.username, mystake:this.state.mystake}),
+                        headers: { 'Content-Type': 'application/json' }
+                    }
+                ).then(response => {
+                    return response.json();
+                }).then(async response => {
+                    if(response.msg === 'success'){
+                        await AsyncStorage.setItem('gameid', this.state.gameid);
+                        navigation.navigate('/user/home/waitingroom2');
+                    }else{
+                        this.setState({stakereqloading: false, joingamewarning:response.msg});                
+                    }
+                });
+    
             }else{
-                this.setState({stakereqloading: false, joingamewarning:response.msg});                
-            }
-        });
+                this.setState({mystakewarning: 'A wager option must be selected in order to stake on this game.'})
+            }   
+        }
     }
 
     render(){
@@ -121,7 +173,7 @@ class JoinGame extends Component{
                     </TouchableOpacity>
                     <Text style={{fontFamily:'Chakra Petch SemiBold', fontSize:24, marginLeft:108, color:this.state.screenmode==='dark'?'white':'black'}}>Join Game</Text>
                 </View>
-                <View style={{display:!this.state.loading?'flex':'none', marginTop:20, width: Dimensions.get('window').width}}>
+                <ScrollView style={{display:!this.state.loading?'flex':'none', marginTop:20, width: Dimensions.get('window').width, maxHeight: Dimensions.get('window').height*0.84, paddingBottom:40}}>
                     <View style={{paddingLeft:24, paddingRight:24, width: Dimensions.get('window').width, marginTop:20}}>
                         <Text style={{fontFamily:'Chakra Petch Regular', color:this.state.screenmode==='dark'?'white':'#646060', fontSize:16}}>Input the code of the game you want to stake on</Text>
                         <TextInput
@@ -154,7 +206,43 @@ class JoinGame extends Component{
 
                                 <Text style={{fontFamily:'Chakra Petch Regular', fontSize:16, color:this.state.screenmode==='dark'?'white':'#928E8E', marginTop:15}}>Stake</Text>
                                 <Text style={{marginTop:3, fontFamily:'Chakra Petch SemiBold', fontSize:24, color:this.state.screenmode==='dark'?'rgb(40, 120, 20)':'#124D07'}}>{'NGN '+(this.state.game.stake?this.state.game.stake:'')}</Text>
+ 
+                                <Text style={{fontFamily:'Chakra Petch Regular', fontSize:16, color:this.state.screenmode==='dark'?'white':'#928E8E', marginTop:15}}>Staked on</Text>
+                                <Text style={{marginTop:3, fontFamily:'Chakra Petch SemiBold', fontSize:24, color:this.state.mystakecolor}}>{this.state.mystake}</Text>
+                                <Text style={{display:this.state.mystake==='' && this.state.mystakewarning!==''?'flex':'none', marginTop:3, fontFamily:'Chakra Petch Regular', fontSize:14, color:'red'}}>{this.state.mystakewarning}</Text>
 
+                                <View style={{display:this.state.game.bettype==='admin'?'flex':'none', marginTop:20, width:Dimensions.get('window').width*0.9, flexDirection:'row', alignItem:'center', justifyContent:'space-around', flexWrap:'wrap'}}>
+                                    {
+                                        this.state.game.availablewagers?
+                                            this.state.game.availablewagers.map((opt, index) => {
+                                                if(index===0){
+                                                    return(
+                                                        <TouchableOpacity key={'wager'+index} style={{ backgroundColor:'rgba(15,25,166,0.3)', borderRadius:6, padding:10, paddingLeft:15, paddingRight:15, paddingTop:8, paddingBottom:8, marginTop:10}} onPress={()=>{ this.setState({mystake: opt, mystakecolor:this.state.screenmode==='dark'?'rgb(60,100,255)':'#0F19A6'}); }}>
+                                                            <Text style={{fontFamily:'Chakra Petch Regular', fontSize:16, color:this.state.screenmode==='dark'?'rgb(60,100,255)':'#0F19A6'}}>{opt}</Text>
+                                                        </TouchableOpacity>
+                                                    );
+                                                }
+
+                                                if(index===1){
+                                                    return(
+                                                        <TouchableOpacity key={'wager'+index} style={{backgroundColor:'rgba(244,25,25,0.3)', borderRadius:6, padding:10, paddingLeft:15, paddingRight:15, paddingTop:8, paddingBottom:8,  marginTop:10}} onPress={()=>{ this.setState({mystake: opt, mystakecolor:this.state.screenmode==='dark'?'rgb(255,80,80)':'#F41919'}); }}>
+                                                            <Text style={{fontFamily:'Chakra Petch Regular', fontSize:16, color:this.state.screenmode==='dark'?'rgb(255,80,80)':'#F41919'}}>{opt}</Text>
+                                                        </TouchableOpacity>
+                                                    );
+                                                }
+
+                                                if(index===2){
+                                                    return(
+                                                        <TouchableOpacity key={'wager'+index} style={{backgroundColor:'rgba(146,142,142,0.3)', borderRadius:6, padding:10, paddingLeft:15, paddingRight:15, paddingTop:8, paddingBottom:8, marginTop:10}} onPress={()=>{ this.setState({mystake: opt, mystakecolor:'#928E8E'}); }}>
+                                                            <Text style={{fontFamily:'Chakra Petch Regular', fontSize:16, color:'#928E8E'}}>{opt}</Text>
+                                                        </TouchableOpacity>
+                                                    );
+                                                }
+                                            })
+                                        :''
+                                    }
+                                </View>
+                                
                                 <View>
                                     <Text style={{display:this.state.joingamewarning===''?'none':'flex', marginTop:30, color:'red', fontFamily:'Chakra Petch Regular', fontSize:14}}>{this.state.joingamewarning}</Text>
                                     <TouchableOpacity style={{display:this.state.joingamewarning===''?'flex':'none', flexDirection:'row', alignItems:'center', justifyContent:'center', backgroundColor:this.state.screenmode==='dark'?'#1E9E40':'#928E8E', width:362, height:56, borderRadius:6, marginTop:30}} onPress={()=>{this.stake();}}>
@@ -165,7 +253,7 @@ class JoinGame extends Component{
                             </View>
                         </View>
                     </View>
-                </View>
+                </ScrollView>
             </View>
         );
     }

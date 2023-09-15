@@ -6,6 +6,10 @@ const Layout = () => {
         <Stack.Screen name="creategame"/>
         <Stack.Screen name="joingame"/>
         <Stack.Screen name="waitingroom"/>
+        <Stack.Screen name="waitingroom2"/>
+        <Stack.Screen name="decisionroom"/>
+        <Stack.Screen name="decisionroom2"/>
+        <Stack.Screen name="notifications"/>
     </Stack>
     )
 }

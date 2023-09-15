@@ -15,6 +15,7 @@ class WaitingRoom extends Component{
         wagerNames: [],
         reqloading: false,
         reqwarning:'',
+        accesstype: ''
     }
 
     async componentDidMount(){
@@ -33,7 +34,7 @@ class WaitingRoom extends Component{
             if(data && data!==null){
                 //Check if user is an imposter in the waiting room and also get userdata
                 const defrequest = fetch(
-                    "http://localhost:3000/wrimpostercheck",
+                    "http://localhost:3000/wrimpostercheck2",
                     {
                         method: 'POST',
                         body: JSON.stringify({userid: data.userid, gameid: gameid}),
@@ -69,7 +70,7 @@ class WaitingRoom extends Component{
                             
                             if(!gamestate.wagersidlist.includes(data.userid)){
                                 gamestate.wagersidlist.push(data.userid);
-                                gamestate.wagerschoices.push('I win');
+                                gamestate.wagerschoices.push(data.stake);
                                 gamestate.history.push(data.username+' staked '+gamestate.stake);
                                 
                                 this.setState({game: gamestate});
@@ -81,11 +82,12 @@ class WaitingRoom extends Component{
                         });
 
                         socket.on(response.game.id+'gamestarted', (arg)=>{
-                            navigation.navigate('/user/home/decisionroom');
+                            navigation.navigate('/user/home/decisionroom2');
                         });
-                        
+                    
+                        let wagernames = [ response.game.availablewagers[0].slice(0, response.game.availablewagers[0].indexOf(' wins')), response.game.availablewagers[1].slice(0, response.game.availablewagers[1].indexOf(' wins')) ]
                         //Get data
-                        this.setState({userdata: response.data, game:response.game, loading:false, wagerNames:response.wagerNames, socket: socket}); 
+                        this.setState({userdata: response.data, game:response.game, loading:false, wagerNames:wagernames, socket: socket, accesstype:response.accesstype}); 
                     }  
                 });
             
@@ -115,7 +117,7 @@ class WaitingRoom extends Component{
         }).then(async response => {
             if(response.msg === 'success'){
                 //Carry out socket action
-                this.state.socket.emit('removestake', JSON.stringify({gameid:this.state.gameid, userid:this.state.userdata.userid, username:response.username}))
+                this.state.socket.emit('removestake', JSON.stringify({gameid:this.state.gameid, userid:this.state.userdata.userid, username:response.username}));
                 
                 this.setState({reqloading: false});
                 navigation.navigate('/user/home');
@@ -151,7 +153,6 @@ class WaitingRoom extends Component{
 
     startgame = () => {
         this.setState({reqloading:true, reqwarning: ''});
-
         fetch(
             "http://localhost:3000/startgame",
             {
@@ -165,7 +166,7 @@ class WaitingRoom extends Component{
             if(response.msg === 'success'){
                 this.state.socket.emit('startgame', this.state.gameid );
                 this.setState({reqloading:false});
-                navigation.navigate('/user/home/decisionroom')
+                navigation.navigate('/user/home/decisionroom2')
             }else{
                 this.setState({reqloading:false, reqwarning:response.msg});
             }
@@ -224,7 +225,7 @@ class WaitingRoom extends Component{
 
                     <Text style={{color:'red', fontFamily:'Chakra Petch Regular', fontSize:14, marginTop:40}}>{this.state.reqwarning}</Text>
                     <View style={{display:this.state.userdata.userid===this.state.game.creatorid?'flex':'none', flexDirection:'row', alignItems:'center', justifyContent:'space-between', width:362, height:56, borderRadius:6, marginTop:5}}>
-                        <TouchableOpacity style={{flexDirection:'row', alignItems:'center', justifyContent:'center', backgroundColor:this.state.game.wagersidlist ? this.state.game.wagersidlist.length===2?'#1E9E40':'#928E8E':'#928E8E', width:170, height:56, borderRadius:6}} onPress={()=>{this.state.game.wagersidlist.length===2 && !this.state.reqloading ? this.startgame() : '';}}>
+                        <TouchableOpacity style={{flexDirection:'row', alignItems:'center', justifyContent:'center', backgroundColor:this.state.game.wagersidlist ? this.state.game.wagerschoices.length>1 && !(this.state.game.wagerschoices.every(x=>x===this.state.game.wagerschoices[0])) ?'#1E9E40':'#928E8E':'#928E8E', width:170, height:56, borderRadius:6}} onPress={()=>{this.state.game.wagersidlist.length>1 && !(this.state.game.wagerschoices.every(x=>x===this.state.game.wagerschoices[0])) && !this.state.reqloading ? this.startgame() : '';}}>
                             <ActivityIndicator style={{ display: this.state.reqloading?'flex':'none' }} color='white'></ActivityIndicator>
                             <Text style={{display:!this.state.reqloading?'flex':'none', color:'white', fontFamily:'Chakra Petch Regular', fontSize:15}}>Start Game</Text>
                         </TouchableOpacity>

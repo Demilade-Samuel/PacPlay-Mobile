@@ -45,6 +45,7 @@ class Wallet extends Component{
                 <View style={{display:!this.state.loading?'flex':'none', ...styles.mainView}}>
                     <Header
                         username={this.state.userdata.username}
+                        profilepic={this.state.userdata.profilepic?this.state.userdata.profilepic:'http://localhost:3000/public/defaultpic.png'}
                         screenmode={this.state.screenmode}
                     />
 

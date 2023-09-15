@@ -4,7 +4,7 @@ import Header from '../../../../components/header';
 import VirtualCard from '../../../../components/virtualcard';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
-import { io } from 'socket.io-client';
+//import { io } from 'socket.io-client';
 
 /* 
     AsyncStorage Structures
@@ -26,11 +26,12 @@ class Home extends Component {
     }
 
     async componentDidMount(){
-        const socket = io('http://localhost:4000');
-        let data = await AsyncStorage.getItem('userdata');
-        data = JSON.parse(data);
         let screenmode = await AsyncStorage.getItem('screenmode');
         this.setState({screenmode: screenmode});
+        //const socket = io('http://localhost:4000');
+        let data = await AsyncStorage.getItem('userdata');
+        data = JSON.parse(data);
+        
 
         console.log(data && data!==null);
         //If user data is in Async Storage
@@ -64,6 +65,7 @@ class Home extends Component {
                     <Header
                         screenmode={this.state.screenmode}
                         username={this.state.userdata.username?this.state.userdata.username:''}
+                        profilepic={this.state.userdata.profilepic?this.state.userdata.profilepic:'http://localhost:3000/public/defaultpic.png'}
                     />
                     
                     <VirtualCard

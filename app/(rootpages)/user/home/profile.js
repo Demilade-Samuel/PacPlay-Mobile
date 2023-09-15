@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { View, Text, Image, TextInput, Dimensions, TouchableOpacity, ActivityIndicator, ScrollView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as DocumentPicker from 'expo-document-picker';
 
 class Profile extends Component{
     constructor(props){
@@ -47,7 +48,9 @@ class Profile extends Component{
         vcodeloading: false,
         vcodelabel:'',
         vcodecolor:'',
-        screenmode:''
+        screenmode:'',
+        reqloading:false,
+        picchanged: false
     }
 
     async componentDidMount(){
@@ -277,7 +280,28 @@ class Profile extends Component{
         }
     }
 
-
+    profPicker = async () => {
+        const response = await DocumentPicker.getDocumentAsync({type: 'image/*'});
+        
+        let data = new FormData();
+        data.append('profpic', response.output[0]);
+        data.append('userid', this.state.userdata.userid);
+        this.setState({reqloading: true, picchanged:false});
+        
+        fetch(
+            "http://localhost:3000/profpicupload",
+            {
+                method: 'POST',
+                body: data
+            }  
+        ).then(response=>{
+            return response.json();
+        }).then(async response=>{
+            let userdata = this.state.userdata;
+            userdata.profilepic = response.profpic;
+            this.setState({userdata: userdata, reqloading:false, picchanged:true});
+        });
+    }
 
 
     render(){
@@ -293,13 +317,20 @@ class Profile extends Component{
                 <ScrollView ref={this.scrollViewRef} style={{ display:!this.state.loading?'flex':'none', overflowX: 'none'}} 
                     showsHorizontalScrollIndicator={false} horizontal decelerationRate={0} snapToInterval={Dimensions.get('window').width} snapToAlignment={"center"} scrollEnabled={false}>
                 <View style={{width:Dimensions.get('window').width, flexDirection:'column', alignItems:'center', justifyContent:'flex-start'}}>
-                    <Image style={{width:80, height:80, borderRadius:'50%', marginTop:20}} source={{uri:'https://lh3.googleusercontent.com/a/AAcHTtd0T2Z9BXfB350McjCdHFVkoySPGdcJ7GG4JmgNS_28Q7I=s96-c'}}></Image>
+                    
+                    <TouchableOpacity onPress={()=>{ !this.state.reqloading? this.profPicker() :'';}} style={{position:'relative', width:100, height:100, justifyContent:'center', alignItems:'center', marginTop:10, marginBottom:10}}>
+                        <Image style={{width:100, height:100, borderRadius:'50%'}} source={{uri:this.state.userdata.profilepic?this.state.userdata.profilepic:'http://localhost:3000/public/defaultpic.png'}}></Image>
+                        <ActivityIndicator style={{display:this.state.reqloading?'flex':'none', position:'absolute'}}></ActivityIndicator>
+                    </TouchableOpacity>
+                    <Text style={{display:'flex', fontFamily:'Chakra Petch Regular', color:'green', textAlign:'center', width:Dimensions.get('window').width-40, marginBottom:10}}>
+                        Profile Picture changed. The change might take a few minutes to show but try going back to the home tab.
+                    </Text>
 
                     <View style={{flexDirection:'row', alignItems:'center', justifyContent:'space-around', width:332, height:69, marginTop:10}}>
                         <View style={{flexDirection:'colum', alignItems:'center', justifyContent:'space-between', height:70}}>
                             <Text style={{fontFamily:'Chakra Petch Regular', fontSize:14, color:this.state.screenmode==='dark'?'white':'black'}}>Games Created</Text>
                             <View style={{width:80, height:40, borderRadius:4, backgroundColor:this.state.screenmode==='dark'?'white':'black', alignItems:'center', justifyContent:'center'}}>
-                                <Text style={{fontFamily:'Chakra Petch Regular', fontSize:18, color:this.state.screenmode==='dark'?'black':'white', textAlign:'center', }}>{this.state.userdata.gamescreated?this.state.userdata.gamescreated.length:'0'}</Text>
+                                <Text style={{fontFamily:'Chakra Petch Regular', fontSize:18, color:this.state.screenmode==='dark'?'black':'white', textAlign:'center', }}>{this.state.userdata.gamescreated?this.state.userdata.gamescreated.filter(x=>x.status!=='cancelled').length:'0'}</Text>
                             </View>
                         </View>
 
